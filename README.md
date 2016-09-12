@@ -6,12 +6,12 @@ Https、队列、缓存模块
 
 ##gradle
 
-```
+```java
 compile 'com.haibin:httpnet:1.0.0'
 ```
 
 ##using
-```
+```java
 GET请求：
 HttpNetClient client = new HttpNetClient();
         Request request = new Request.Builder().encode("UTF-8")
