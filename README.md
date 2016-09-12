@@ -12,7 +12,7 @@ compile 'com.haibin:httpnet:1.0.0'
 
 ##using
 ```java
-GET请求：
+GET：
 HttpNetClient client = new HttpNetClient();
         Request request = new Request.Builder().encode("UTF-8")
                 .method("GET")
@@ -20,7 +20,7 @@ HttpNetClient client = new HttpNetClient();
                 .url("http://www.oschina.net")
                 .build();
         
-POST请求：
+POST：
 RequestParams params = new RequestParams()
                 .put("userName","oscer")
                 .put("pwd","oschina");
