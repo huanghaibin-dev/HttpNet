@@ -7,7 +7,7 @@ Https、队列、缓存模块
 ##gradle
 
 ```java
-compile 'com.haibin:httpnet:1.0.0'
+compile 'com.haibin:httpnet:1.0.1'
 ```
 
 ##using
