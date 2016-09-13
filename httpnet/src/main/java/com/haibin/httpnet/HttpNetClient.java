@@ -16,8 +16,8 @@
 package com.haibin.httpnet;
 
 import com.haibin.httpnet.builder.Request;
-import com.haibin.httpnet.core.call.Call;
 import com.haibin.httpnet.core.Dispatcher;
+import com.haibin.httpnet.core.call.Call;
 import com.haibin.httpnet.core.call.RealCall;
 
 /**

@@ -16,6 +16,7 @@
 package com.haibin.httpnet.core.io;
 
 import com.haibin.httpnet.builder.RequestParams;
+import com.haibin.httpnet.core.ContentTypeFactory;
 
 import java.io.DataInputStream;
 import java.io.File;
@@ -66,7 +67,7 @@ public class MultiPartContent extends HttpContent {
             buffer.append(END + DATA_TAG + BOUNDARY + END);
             buffer.append("Content-Disposition: form-data; name=\"" + key + "\"; filename=\"" + fileName + "\"");
             buffer.append(END);
-            buffer.append("Content-Type: " + getContentType(fileName));
+            buffer.append("Content-Type: " + ContentTypeFactory.getInstance().getContentType(fileName));
             buffer.append(END + END);
             mOutputStream.writeBytes(buffer.toString());
             outputFile(file);
@@ -81,10 +82,6 @@ public class MultiPartContent extends HttpContent {
             mOutputStream.write(bufferOut, 0, bytes);
         }
         in.close();
-    }
-
-    private String getContentType(String fileName) {
-        return "image/jpeg";
     }
 
     private void intoString(StringBuffer buffer) {
