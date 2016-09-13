@@ -134,6 +134,8 @@ public final class Request {
                 } else {
                     mHttpContent = new FormContent(mParams, mEncode);
                 }
+            }else {
+                mParams = null;
             }
             return new Request(this);
         }
