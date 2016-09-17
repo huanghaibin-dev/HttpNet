@@ -24,14 +24,24 @@ HttpNetClient client = new HttpNetClient();
 POST：
 RequestParams params = new RequestParams()
                 .put("userName","oscer")
+                .putFile("fileName","file")
                 .put("pwd","oschina");
-        Request request1 = new Request.Builder()
+        Request request = new Request.Builder()
                 .encode("UTF-8")
                 .method("POST")
                 .params(params)
                 .timeout(13000)
                 .url("http://www.oschina.net")
                 .build();
+POST JSON：
+        Request request = new Request.Builder()
+                .encode("UTF-8")
+                .method("POST")
+                .content(new JsonContent("json")
+                .timeout(13000)
+                .url("http://www.oschina.net")
+                .build();
+
 
 client.newCall(request).execute(new CallBack() {
             @Override
