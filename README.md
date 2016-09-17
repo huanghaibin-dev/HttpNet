@@ -2,7 +2,7 @@
 ![输入图片说明](http://git.oschina.net/uploads/images/2016/0912/101823_10ccdcb3_494015.png "在这里输入图片标题")
 
 HttpNet网络请求框架基于HttpUrlConnection，采用Client + Request + Call的请求模型，后续将会实现
-Https、队列、缓存模块
+Https、队列、缓存模块，配合[Elegant](http://git.oschina.net/huanghaibin_dev/Elegant)体验新的Android开发高潮
 
 ##gradle
 
