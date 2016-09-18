@@ -17,6 +17,7 @@ package com.haibin.httpnet.core;
 
 import com.haibin.httpnet.core.call.AsyncCall;
 
+import java.util.LinkedHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -29,6 +30,8 @@ import java.util.concurrent.TimeUnit;
 public final class Dispatcher {
     private static final int MAX_REQUEST_TASK = 64;
     private static final int PRE_REQUEST_TASK = 5;
+    //private LruCache<String,AsyncCall> mRequestCache = new LruCache<>(1024);
+    private LinkedHashMap<String, AsyncCall> mRequestCache = new LinkedHashMap<>(1024 * 1024);
     private ExecutorService mExecutorService;
 
     public Dispatcher() {

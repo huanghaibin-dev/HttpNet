@@ -16,7 +16,8 @@
 package com.haibin.httpnet.core.call;
 
 import com.haibin.httpnet.builder.Request;
-import com.haibin.httpnet.core.Connection;
+import com.haibin.httpnet.core.connect.Connection;
+import com.haibin.httpnet.core.connect.HttpConnection;
 
 /**
  *
@@ -30,12 +31,12 @@ public class AsyncCall implements Runnable {
     public AsyncCall(Request request, CallBack callBack) {
         this.mCallBack = callBack;
         this.mRequest = request;
-        mConnection = new Connection();
+        mConnection = new HttpConnection();
     }
 
     @Override
     public void run() {
-        mConnection.doRequest(mRequest, mCallBack);
+        mConnection.connect(mRequest, mCallBack);
     }
 
     public CallBack getCallBack() {
