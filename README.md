@@ -8,7 +8,7 @@ Https、队列、缓存模块
 ##gradle
 
 ```java
-compile 'com.haibin:httpnet:1.0.1'
+compile 'com.haibin:httpnet:1.0.3'
 ```
 
 ##using
@@ -46,7 +46,8 @@ POST JSON：
 client.newCall(request).execute(new CallBack() {
             @Override
             public void onResponse(Response response) {
-
+                String body = response.getBody();
+                InputStream is = response.toStream();//如果采用下载
             }
 
             @Override
