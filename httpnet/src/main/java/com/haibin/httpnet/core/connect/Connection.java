@@ -22,11 +22,10 @@ import com.haibin.httpnet.core.Response;
 import com.haibin.httpnet.core.call.CallBack;
 import com.haibin.httpnet.core.io.HttpContent;
 
-import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
-import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.ProtocolException;
 import java.net.Proxy;
 import java.net.URL;
@@ -42,8 +41,7 @@ import java.util.Set;
 public abstract class Connection {
     protected Request mRequest;
     protected DataOutputStream mOutputStream;
-    protected DataInputStream mInputStream;
-    private ByteArrayOutputStream mBos;
+    protected InputStream mInputStream;
     protected URLConnection mUrlConnection;
     protected Proxy mProxy;
 
@@ -63,12 +61,12 @@ public abstract class Connection {
                 mUrlConnection = url.openConnection();
             else
                 mUrlConnection = url.openConnection(mProxy);
+
             initConnection();
             initHeaders();
-
             initMethod(method);
-            boolean isPOST = "POST".equalsIgnoreCase(method);
-            if (isPOST)
+
+            if ("POST".equalsIgnoreCase(method))
                 post(callBack);
             else if ("GET".equals(method))
                 get(callBack);
@@ -76,9 +74,11 @@ public abstract class Connection {
                 put(callBack);
             else if ("DELETE".equals(method))
                 delete(callBack);
-            onResponse(callBack);
+            mInputStream = mUrlConnection.getInputStream();
+            callBack.onResponse(new Response(getResponseCode(), mInputStream, mUrlConnection.getHeaderFields(), mRequest.encode()));
         } catch (IOException e) {
             e.printStackTrace();
+            callBack.onFailure(e);
         } finally {
             finish();
         }
@@ -112,22 +112,6 @@ public abstract class Connection {
     protected void delete(CallBack callBack) throws IOException {
 
     }
-
-
-    protected void onResponse(CallBack callBack) throws IOException {
-        Response response = new Response();
-        response.setCode(getResponseCode());
-        response.setHeaders(mUrlConnection.getHeaderFields());
-        mInputStream = new DataInputStream(mUrlConnection.getInputStream());
-        mBos = new ByteArrayOutputStream();
-        int b;
-        while ((b = mInputStream.read()) != -1) {
-            mBos.write(b);
-        }
-        response.setBody(new String(mBos.toByteArray(), mRequest.encode()));
-        callBack.onResponse(response);
-    }
-
 
     /**
      * 初始化基础链接
@@ -194,6 +178,6 @@ public abstract class Connection {
      *
      */
     protected void finish() {
-        finishClose(mOutputStream, mInputStream, mBos);
+        finishClose(mOutputStream, mInputStream);
     }
 }
