@@ -25,15 +25,15 @@ android {
         }
     }
 
-    task makeJar(type: Copy) {
-        delete 'build/libs/mysdk.jar'
+    task intoJar(type: Copy) {
+        delete 'build/libs/httpnet.jar'
         from('build/intermediates/bundles/release/')
         into('build/libs/')
         include('classes.jar')
         rename ('classes.jar', 'httpnet.jar')
     }
 
-    makeJar.dependsOn(build)
+    intoJar.dependsOn(build)
 }
 
 dependencies {

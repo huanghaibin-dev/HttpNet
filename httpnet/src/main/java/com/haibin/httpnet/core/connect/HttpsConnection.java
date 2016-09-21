@@ -15,10 +15,16 @@
  */
 package com.haibin.httpnet.core.connect;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.ProtocolException;
+import java.security.KeyStore;
 
+import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManagerFactory;
 
 /**
  *
@@ -27,18 +33,73 @@ import javax.net.ssl.HttpsURLConnection;
 public class HttpsConnection extends Connection {
     private HttpsURLConnection mConnection;
 
+    public HttpsConnection() {
+    }
+
     @Override
     protected int getResponseCode() throws IOException {
-        return 0;
+        return mConnection.getResponseCode();
     }
 
     @Override
     protected void initMethod(String method) throws ProtocolException {
-
+        mConnection.setRequestMethod(method);
     }
 
     @Override
     protected void convertConnect() {
         mConnection = (HttpsURLConnection) mUrlConnection;
+        SSLContext sslContext = null;
+        // 实例化主机名验证接口
+        HostnameVerifier hnv = new HostVerifier();
+        try {
+            sslContext = getSSLContext("", "", "");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (sslContext != null) {
+            HttpsURLConnection.setDefaultSSLSocketFactory(sslContext
+                    .getSocketFactory());
+        }
+        HttpsURLConnection.setDefaultHostnameVerifier(hnv);
+    }
+
+    public static KeyStore getKeyStore(String password, String keyStorePath)
+            throws Exception {
+        // 实例化密钥库
+        KeyStore ks = KeyStore.getInstance("JKS");
+        // 获得密钥库文件流
+        FileInputStream is = new FileInputStream(keyStorePath);
+        // 加载密钥库
+        ks.load(is, password.toCharArray());
+        // 关闭密钥库文件流
+        is.close();
+        return ks;
+    }
+
+    public static SSLContext getSSLContext(String password,
+                                           String keyStorePath, String trustStorePath) throws Exception {
+        // 实例化密钥库
+        KeyManagerFactory keyManagerFactory = KeyManagerFactory
+                .getInstance(KeyManagerFactory.getDefaultAlgorithm());
+        // 获得密钥库
+        KeyStore keyStore = getKeyStore(password, keyStorePath);
+        // 初始化密钥工厂
+        keyManagerFactory.init(keyStore, password.toCharArray());
+
+        // 实例化信任库
+        TrustManagerFactory trustManagerFactory = TrustManagerFactory
+                .getInstance(TrustManagerFactory.getDefaultAlgorithm());
+        // 获得信任库
+        KeyStore trustStore = getKeyStore(password, trustStorePath);
+        // 初始化信任库
+        trustManagerFactory.init(trustStore);
+        // 实例化SSL上下文
+        SSLContext ctx = SSLContext.getInstance("TLS");
+        // 初始化SSL上下文
+        ctx.init(keyManagerFactory.getKeyManagers(),
+                trustManagerFactory.getTrustManagers(), null);
+        // 获得SSLSocketFactory
+        return ctx;
     }
 }

@@ -18,6 +18,7 @@ package com.haibin.httpnet.core.call;
 import com.haibin.httpnet.builder.Request;
 import com.haibin.httpnet.core.connect.Connection;
 import com.haibin.httpnet.core.connect.HttpConnection;
+import com.haibin.httpnet.core.connect.HttpsConnection;
 
 /**
  *
@@ -31,7 +32,7 @@ public class AsyncCall implements Runnable {
     public AsyncCall(Request request, CallBack callBack) {
         this.mCallBack = callBack;
         this.mRequest = request;
-        mConnection = new HttpConnection();
+        mConnection = request.url().startsWith("https") ? new HttpsConnection() : new HttpConnection();
     }
 
     @Override
