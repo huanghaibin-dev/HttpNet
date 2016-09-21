@@ -1,5 +1,5 @@
 #HttpNet项目结构如下
-![输入图片说明](http://git.oschina.net/uploads/images/2016/0912/101823_10ccdcb3_494015.png "在这里输入图片标题")
+![输入图片说明](http://git.oschina.net/uploads/images/2016/0919/132807_3e935005_494015.png "在这里输入图片标题")
 
 HttpNet网络请求框架基于HttpUrlConnection，采用Client + Request + Call的请求模型，后续将会实现
 Https、队列、缓存模块
@@ -8,7 +8,7 @@ Https、队列、缓存模块
 ##gradle
 
 ```java
-compile 'com.haibin:httpnet:1.0.1'
+compile 'com.haibin:httpnet:1.0.3'
 ```
 
 ##using
@@ -46,7 +46,8 @@ POST JSON：
 client.newCall(request).execute(new CallBack() {
             @Override
             public void onResponse(Response response) {
-
+                String body = response.getBody();
+                InputStream is = response.toStream();//如果采用下载
             }
 
             @Override
