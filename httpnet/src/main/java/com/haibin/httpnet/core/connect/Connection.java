@@ -21,6 +21,7 @@ import com.haibin.httpnet.builder.RequestParams;
 import com.haibin.httpnet.core.Response;
 import com.haibin.httpnet.core.call.CallBack;
 import com.haibin.httpnet.core.io.HttpContent;
+import com.haibin.httpnet.core.io.IO;
 
 import java.io.Closeable;
 import java.io.DataOutputStream;
@@ -146,18 +147,7 @@ public abstract class Connection {
      *
      * @param closeables closeables
      */
-    protected void finishClose(Closeable... closeables) {
-        for (Closeable cb : closeables) {
-            try {
-                if (null == cb) {
-                    continue;
-                }
-                cb.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
+
 
     /**
      * 获取Content-Type
@@ -175,6 +165,6 @@ public abstract class Connection {
      *
      */
     protected void finish() {
-        finishClose(mOutputStream, mInputStream);
+        IO.close(mOutputStream, mInputStream);
     }
 }
