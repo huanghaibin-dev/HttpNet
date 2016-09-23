@@ -56,9 +56,11 @@ client.newCall(request).execute(new CallBack() {
             }
         });
 
-//如果使用数字证书,使用下面API导入证书即可
-ConnectionManager.setSslSocketFactory(getAssets().open("12306.cer"));
-ConnectionManager.setSslSocketFactory(“filepath/12306.cer”);
+//默认支持Https认证，如果使用数字证书,使用下面3种API导入证书即可
+
+ConnectionManager.setSslSocketFactory(getAssets().open("12306.cer"));//证书文件输入流
+ConnectionManager.setSslSocketFactory(“filepath/12306.cer”);//证书路径
+ConnectionManager.setSslSocketFactoryAsString("cerValue");//证书文本
 
 Request request = new Request.Builder()
                 .encode("UTF-8")
