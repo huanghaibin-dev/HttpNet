@@ -11,6 +11,24 @@ HttpNet网络请求框架基于HttpUrlConnection，采用Client + Request + Call
 compile 'com.haibin:httpnet:1.0.3'
 ```
 
+###默认支持Https认证，如果使用数字证书,在执行请求之前使用下面3种API导入证书即可
+
+```java
+
+ConnectionManager.setSslSocketFactory(getAssets().open("12306.cer"));//证书文件输入流
+ConnectionManager.setSslSocketFactory("filepath/12306.cer");//证书路径
+ConnectionManager.setSslSocketFactoryAsString("cerValue");//证书文本
+
+Request request = new Request.Builder()
+                .encode("UTF-8")
+                .method("GET")
+                .timeout(13000)
+                .proxy("192.168.1.1",80) //支持HTTP代理
+                .url("https://kyfw.12306.cn/otn/")
+                .build();
+```
+
+
 ##GET请求构建:
 ```java
 
@@ -68,24 +86,6 @@ client.newCall(request).execute(new CallBack() {
             }
         });
 ```
-
-
-###默认支持Https认证，如果使用数字证书,使用下面3种API导入证书即可
-
-```java
-
-ConnectionManager.setSslSocketFactory(getAssets().open("12306.cer"));//证书文件输入流
-ConnectionManager.setSslSocketFactory("filepath/12306.cer");//证书路径
-ConnectionManager.setSslSocketFactoryAsString("cerValue");//证书文本
-
-Request request = new Request.Builder()
-                .encode("UTF-8")
-                .method("GET")
-                .timeout(13000)
-                .url("https://kyfw.12306.cn/otn/")
-                .build();
-```
-
 
 ##Licenses
 - Copyright (C) 2013 huanghaibin_dev <huanghaibin_dev@163.com>
