@@ -15,10 +15,12 @@
  */
 package com.haibin.httpnet.core.connect;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.nio.Buffer;
 import java.security.KeyStore;
 import java.security.SecureRandom;
 import java.security.cert.CertificateFactory;
@@ -70,5 +72,9 @@ public final class ConnectionManager {
                 e.printStackTrace();
             }
         }
+    }
+
+    public static void setSslSocketFactoryAsString(String cerValue) {
+        setSslSocketFactory(new ByteArrayInputStream(cerValue.getBytes()));
     }
 }
