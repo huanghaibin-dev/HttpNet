@@ -13,7 +13,7 @@ compile 'com.haibin:httpnet:1.0.3'
 
 ##using
 ```java
-GET：
+GET:
 HttpNetClient client = new HttpNetClient();
         Request request = new Request.Builder().encode("UTF-8")
                 .method("GET")
@@ -21,7 +21,7 @@ HttpNetClient client = new HttpNetClient();
                 .url("http://www.oschina.net")
                 .build();
         
-POST：
+POST:
 RequestParams params = new RequestParams()
                 .put("userName","oscer")
                 .putFile("fileName","file")
@@ -33,7 +33,7 @@ RequestParams params = new RequestParams()
                 .timeout(13000)
                 .url("http://www.oschina.net")
                 .build();
-POST JSON：
+POST JSON:
         Request request = new Request.Builder()
                 .encode("UTF-8")
                 .method("POST")
@@ -59,7 +59,7 @@ client.newCall(request).execute(new CallBack() {
 //默认支持Https认证，如果使用数字证书,使用下面3种API导入证书即可
 
 ConnectionManager.setSslSocketFactory(getAssets().open("12306.cer"));//证书文件输入流
-ConnectionManager.setSslSocketFactory(“filepath/12306.cer”);//证书路径
+ConnectionManager.setSslSocketFactory("filepath/12306.cer");//证书路径
 ConnectionManager.setSslSocketFactoryAsString("cerValue");//证书文本
 
 Request request = new Request.Builder()
