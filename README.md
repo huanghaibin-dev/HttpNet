@@ -11,17 +11,19 @@ HttpNet网络请求框架基于HttpUrlConnection，采用Client + Request + Call
 compile 'com.haibin:httpnet:1.0.3'
 ```
 
-##using
+##GET请求构建:
 ```java
-GET:
-HttpNetClient client = new HttpNetClient();
-        Request request = new Request.Builder().encode("UTF-8")
+
+Request request = new Request.Builder().encode("UTF-8")
                 .method("GET")
                 .timeout(13000)
                 .url("http://www.oschina.net")
                 .build();
-        
-POST:
+```
+
+##POST请求构建:
+```java
+
 RequestParams params = new RequestParams()
                 .put("userName","oscer")
                 .putFile("fileName","file")
@@ -33,15 +35,25 @@ RequestParams params = new RequestParams()
                 .timeout(13000)
                 .url("http://www.oschina.net")
                 .build();
-POST JSON:
-        Request request = new Request.Builder()
+```
+
+##POST JSON请求构建:
+```java
+
+Request request = new Request.Builder()
                 .encode("UTF-8")
                 .method("POST")
                 .content(new JsonContent("json")
                 .timeout(13000)
                 .url("http://www.oschina.net")
                 .build();
+       
+```
 
+##执行请求:
+```java
+
+HttpNetClient client = new HttpNetClient();
 
 client.newCall(request).execute(new CallBack() {
             @Override
@@ -55,8 +67,12 @@ client.newCall(request).execute(new CallBack() {
 
             }
         });
+```
 
-//默认支持Https认证，如果使用数字证书,使用下面3种API导入证书即可
+
+###默认支持Https认证，如果使用数字证书,使用下面3种API导入证书即可
+
+```java
 
 ConnectionManager.setSslSocketFactory(getAssets().open("12306.cer"));//证书文件输入流
 ConnectionManager.setSslSocketFactory("filepath/12306.cer");//证书路径
