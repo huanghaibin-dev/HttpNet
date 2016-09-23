@@ -26,7 +26,7 @@ public class MainActivity extends AppCompatActivity {
         iv = (ImageView) findViewById(R.id.iv);
 
         try {
-            ConnectionManager.setSslSocketFactory(getAssets().open("12306.cer"));
+            ConnectionManager.setSslSocketFactory(getAssets().open("google.cer"));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
                 .encode("UTF-8")
                 .method("GET")
                 .timeout(13000)
-                .proxy("193.168.1.208",1080)
+                .proxy("52.8.230.224",3128)
                 .url("https://www.google.com.hk/")
                 .build();
         client.newCall(request).execute(new CallBack() {
