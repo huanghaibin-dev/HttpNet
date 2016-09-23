@@ -7,15 +7,12 @@ import android.util.Log;
 import android.widget.ImageView;
 
 import com.haibin.httpnet.HttpNetClient;
-import com.haibin.httpnet.builder.Headers;
 import com.haibin.httpnet.builder.Request;
-import com.haibin.httpnet.builder.RequestParams;
 import com.haibin.httpnet.core.Response;
 import com.haibin.httpnet.core.call.CallBack;
+import com.haibin.httpnet.core.connect.ConnectionManager;
 
-import java.security.PublicKey;
-import java.security.cert.CertificateFactory;
-import java.security.cert.X509Certificate;
+import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -29,38 +26,22 @@ public class MainActivity extends AppCompatActivity {
         iv = (ImageView) findViewById(R.id.iv);
 
         try {
-            CertificateFactory certificatefactory = CertificateFactory.getInstance("X.509");
-
-            X509Certificate Cert = (X509Certificate) certificatefactory.generateCertificate(getAssets().open("ad.cer"));
-            PublicKey pk = Cert.getPublicKey();
-            if (pk != null) {
-
-            }
-        } catch (Exception e) {
+            ConnectionManager.setSslSocketFactory(getAssets().open("ad.cer"));
+        } catch (IOException e) {
             e.printStackTrace();
         }
-
-
         HttpNetClient client = new HttpNetClient();
-        RequestParams params = new RequestParams();
-        params.put("username", "huanghaibin_dev@163.com");
-        params.put("pwd", "wh.738539302");
-        params.put("keep_login", 1);
-        Headers.Builder headers = new Headers.Builder()
-                .addHeader("X-Requested-With","XMLHttpRequest")
-                .addHeader("Host","www.oschina.net");
         Request request = new Request.Builder()
                 .encode("UTF-8")
-                .method("POST")
-                .params(params)
+                .method("GET")
                 .timeout(13000)
-                .url("https://www.oschina.net/action/api/login_validate")
+                .url("https://kyfw.12306.cn/otn/")
                 .build();
         client.newCall(request).execute(new CallBack() {
             @Override
             public void onResponse(Response response) {
                 if (response != null) {
-                    Log.e("result", response.getBody());
+                    Log.e("handler", response.getBody());
                 }
             }
 
@@ -70,4 +51,5 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
 }

@@ -31,8 +31,10 @@ public final class Request {
     private String mEncode;
     private int mTimeout;
     private HttpContent mHttpContent;
+    private String mHost;
+    private int mPort;
 
-    public Request(Builder builder) {
+    private Request(Builder builder) {
         this.mUrl = builder.mUrl;
         this.mHeaders = builder.mHeaders.build();
         this.mMethod = builder.mMethod;
@@ -40,6 +42,8 @@ public final class Request {
         this.mHttpContent = builder.mHttpContent;
         this.mEncode = builder.mEncode;
         this.mTimeout = builder.mTimeout;
+        this.mHost = builder.mHost;
+        this.mPort = builder.mPort;
     }
 
     public String url() {
@@ -70,6 +74,14 @@ public final class Request {
         return mTimeout;
     }
 
+    public String host() {
+        return mHost;
+    }
+
+    public int port() {
+        return mPort;
+    }
+
     public static final class Builder {
         private String mUrl;
         private String mMethod;
@@ -78,6 +90,8 @@ public final class Request {
         private RequestParams mParams;
         private Headers.Builder mHeaders;
         private HttpContent mHttpContent;
+        private String mHost;
+        private int mPort;
 
         public Builder() {
             this.mMethod = "GET";
@@ -127,6 +141,13 @@ public final class Request {
             return this;
         }
 
+        public Builder proxy(String host, int port) {
+            if (host == null) throw new NullPointerException("host can not be null");
+            this.mHost = host;
+            this.mPort = port;
+            return this;
+        }
+
         public Request build() {
             if (mHttpContent == null && mParams != null) {
                 if (mParams.getMultiParams() != null) {
@@ -134,8 +155,6 @@ public final class Request {
                 } else {
                     mHttpContent = new FormContent(mParams, mEncode);
                 }
-            }else {
-                mParams = null;
             }
             return new Request(this);
         }

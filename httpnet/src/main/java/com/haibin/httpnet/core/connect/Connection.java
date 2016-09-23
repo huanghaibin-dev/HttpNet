@@ -26,6 +26,7 @@ import java.io.Closeable;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.InetSocketAddress;
 import java.net.ProtocolException;
 import java.net.Proxy;
 import java.net.URL;
@@ -43,11 +44,11 @@ public abstract class Connection {
     protected DataOutputStream mOutputStream;
     protected InputStream mInputStream;
     protected URLConnection mUrlConnection;
-    protected Proxy mProxy;
 
     public void connect(Request request, CallBack callBack) {
         this.mRequest = request;
         try {
+            String host = mRequest.host();
             String httpUrl = mRequest.url();
             String method = mRequest.method();
             if ("GET".equalsIgnoreCase(method) || "DELETE".equalsIgnoreCase(method)) {
@@ -57,10 +58,10 @@ public abstract class Connection {
                 }
             }
             URL url = new URL(httpUrl);
-            if (mProxy == null)
+            if (host == null)
                 mUrlConnection = url.openConnection();
             else
-                mUrlConnection = url.openConnection(mProxy);
+                mUrlConnection = url.openConnection(new Proxy(Proxy.Type.HTTP, new InetSocketAddress(host, mRequest.port())));
 
             initConnection();
             initHeaders();
@@ -82,10 +83,6 @@ public abstract class Connection {
         } finally {
             finish();
         }
-    }
-
-    public void withProxy(Proxy proxy) {
-        this.mProxy = proxy;
     }
 
     protected abstract int getResponseCode() throws IOException;

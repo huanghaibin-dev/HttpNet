@@ -20,7 +20,7 @@ import java.net.HttpURLConnection;
 import java.net.ProtocolException;
 
 /**
- *
+ * http
  */
 
 public class HttpConnection extends Connection {
