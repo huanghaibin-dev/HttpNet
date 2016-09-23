@@ -19,6 +19,11 @@ ConnectionManager.setSslSocketFactory(getAssets().open("12306.cer"));//证书文
 ConnectionManager.setSslSocketFactory("filepath/12306.cer");//证书路径
 ConnectionManager.setSslSocketFactoryAsString("cerValue");//证书文本
 
+//注意，添加多个证书只能调用该方法一次，可以使用如下方式添加多个证书
+InputStream is12306 = getAssets().open("12306.cer");
+InputStream isGoogle = getAssets().open("google.cer");
+ConnectionManager.setSslSocketFactory(is12306 , isGoogle );
+
 Request request = new Request.Builder()
                 .encode("UTF-8")
                 .method("GET")
