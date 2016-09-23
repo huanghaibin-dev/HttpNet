@@ -13,6 +13,7 @@ import com.haibin.httpnet.core.call.CallBack;
 import com.haibin.httpnet.core.connect.ConnectionManager;
 
 import java.io.IOException;
+import java.io.InputStream;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -26,7 +27,9 @@ public class MainActivity extends AppCompatActivity {
         iv = (ImageView) findViewById(R.id.iv);
 
         try {
-            ConnectionManager.setSslSocketFactory(getAssets().open("google.cer"));
+            InputStream inputStream = getAssets().open("12306.cer");
+            InputStream inputStream1 = getAssets().open("google.cer");
+            ConnectionManager.setSslSocketFactory(inputStream, inputStream1);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -35,8 +38,7 @@ public class MainActivity extends AppCompatActivity {
                 .encode("UTF-8")
                 .method("GET")
                 .timeout(13000)
-                .proxy("52.8.230.224",3128)
-                .url("https://www.google.com.hk/")
+                .url("https://kyfw.12306.cn/otn/")
                 .build();
         client.newCall(request).execute(new CallBack() {
             @Override

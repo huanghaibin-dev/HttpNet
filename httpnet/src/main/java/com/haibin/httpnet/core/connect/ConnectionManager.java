@@ -37,23 +37,24 @@ import javax.net.ssl.TrustManagerFactory;
 
 public final class ConnectionManager {
     /**
-     * add cer
+     * 添加证书文件流，可添加多个
      */
     public static void setSslSocketFactory(InputStream... cerInputStream) {
         try {
             CertificateFactory certificatefactory = CertificateFactory.getInstance("X.509");
+            KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
+            keyStore.load(null);
+            int index = 0;
             for (InputStream is : cerInputStream) {
                 X509Certificate cert = (X509Certificate) certificatefactory.generateCertificate(is);
-                KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
-                keyStore.load(null);
-                keyStore.setCertificateEntry("secretKeyAlias", cert);
-                SSLContext sslContext = SSLContext.getInstance("TLS");
-                TrustManagerFactory trustManagerFactory =
-                        TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-                trustManagerFactory.init(keyStore);
-                sslContext.init(null, trustManagerFactory.getTrustManagers(), new SecureRandom());
-                HttpsURLConnection.setDefaultSSLSocketFactory(sslContext.getSocketFactory());
+                keyStore.setCertificateEntry("alias" + index++, cert);
             }
+            SSLContext sslContext = SSLContext.getInstance("TLS");
+            TrustManagerFactory trustManagerFactory =
+                    TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+            trustManagerFactory.init(keyStore);
+            sslContext.init(null, trustManagerFactory.getTrustManagers(), new SecureRandom());
+            HttpsURLConnection.setDefaultSSLSocketFactory(sslContext.getSocketFactory());
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -62,22 +63,35 @@ public final class ConnectionManager {
     }
 
     /**
-     * add cer
+     * 添加证书文件，可添加多个
      *
-     * @param cerPath cerPath
+     * @param cerPaths cerPaths
      */
-    public static void setSslSocketFactory(String cerPath) {
-        File file = new File(cerPath);
-        if (file.exists()) {
-            try {
-                setSslSocketFactory(new FileInputStream(file));
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
+    public static void setSslSocketFactory(String... cerPaths) {
+        FileInputStream[] cers = new FileInputStream[cerPaths.length];
+        for (int i = 0; i < cerPaths.length; i++) {
+            File file = new File(cerPaths[i]);
+            if (file.exists()) {
+                try {
+                    cers[i] = new FileInputStream(file);
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
             }
         }
+        setSslSocketFactory(cers);
     }
 
-    public static void setSslSocketFactoryAsString(String cerValue) {
-        setSslSocketFactory(new ByteArrayInputStream(cerValue.getBytes()));
+    /**
+     * 添加证书文本
+     *
+     * @param cerValues cerValues
+     */
+    public static void setSslSocketFactoryAsString(String... cerValues) {
+        ByteArrayInputStream[] cers = new ByteArrayInputStream[cerValues.length];
+        for (int i = 0; i < cerValues.length; i++) {
+            cers[i] = new ByteArrayInputStream(cerValues[i].getBytes());
+        }
+        setSslSocketFactory(cers);
     }
 }
