@@ -1,8 +1,8 @@
 #HttpNet项目结构如下
 ![输入图片说明](http://git.oschina.net/uploads/images/2016/0919/132807_3e935005_494015.png "在这里输入图片标题")
 
-HttpNet网络请求框架基于HttpUrlConnection，采用Client + Request + Call的请求模型，后续将会实现
-Https、队列、缓存模块
+HttpNet网络请求框架基于HttpUrlConnection，采用Client + Request + Call的请求模型，支持https默认证书，数字安全证书！后续将会实现队列、缓存模块。
+
 如果用于Android开发，请使用[Elegant](http://git.oschina.net/huanghaibin_dev/Elegant)体验新的Android开发高潮，它的网络请求模块基于HttpNet，采用动态代理 + 构建的思想，致敬Retrofit！
 
 ##gradle
@@ -55,6 +55,17 @@ client.newCall(request).execute(new CallBack() {
 
             }
         });
+
+//如果使用数字证书,使用下面API导入证书即可
+ConnectionManager.setSslSocketFactory(getAssets().open("12306.cer"));
+ConnectionManager.setSslSocketFactory(“filepath/12306.cer”);
+
+Request request = new Request.Builder()
+                .encode("UTF-8")
+                .method("GET")
+                .timeout(13000)
+                .url("https://kyfw.12306.cn/otn/")
+                .build();
 ```
 
 
