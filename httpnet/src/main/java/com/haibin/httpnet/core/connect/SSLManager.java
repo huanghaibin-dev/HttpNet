@@ -28,12 +28,13 @@ import java.security.SecureRandom;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 
+import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManagerFactory;
 
 /**
- * using https ssl
+ * using https ssl 证书管理工具
  */
 
 public final class SSLManager {
@@ -57,6 +58,30 @@ public final class SSLManager {
     public void setSslSocketFactory(SSLSocketFactory sslSocketFactory) {
         this.mSslSocketFactory = sslSocketFactory;
     }
+
+    public static KeyStore getKeyStore(String keyStorePath, String pwd) throws Exception {
+        KeyStore ks = KeyStore.getInstance("JKS");
+        FileInputStream is = new FileInputStream(keyStorePath);
+        ks.load(is, pwd.toCharArray());
+        is.close();
+        return ks;
+    }
+
+    public static SSLContext getSSLContext(String keyStorePath, String pwd, String trustStorePath) throws Exception {
+        KeyManagerFactory keyManagerFactory = KeyManagerFactory
+                .getInstance(KeyManagerFactory.getDefaultAlgorithm());
+        KeyStore keyStore = getKeyStore(pwd, keyStorePath);
+        keyManagerFactory.init(keyStore, pwd.toCharArray());
+        TrustManagerFactory trustManagerFactory = TrustManagerFactory
+                .getInstance(TrustManagerFactory.getDefaultAlgorithm());
+        KeyStore trustStore = getKeyStore(pwd, trustStorePath);
+        trustManagerFactory.init(trustStore);
+        SSLContext sslContext = SSLContext.getInstance("TLS");
+        sslContext.init(keyManagerFactory.getKeyManagers(),
+                trustManagerFactory.getTrustManagers(), null);
+        return sslContext;
+    }
+
 
     /**
      * 添加证书文件流，可添加多个

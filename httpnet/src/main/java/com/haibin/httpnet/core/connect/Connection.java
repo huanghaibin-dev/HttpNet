@@ -24,7 +24,6 @@ import com.haibin.httpnet.core.call.CallBack;
 import com.haibin.httpnet.core.io.HttpContent;
 import com.haibin.httpnet.core.io.IO;
 
-import java.io.Closeable;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -48,7 +47,7 @@ public abstract class Connection {
     protected URLConnection mUrlConnection;
     protected HttpNetClient mClient;
 
-    public Connection(HttpNetClient client){
+    public Connection(HttpNetClient client) {
         this.mClient = client;
     }
 
@@ -57,24 +56,25 @@ public abstract class Connection {
         try {
             String host = mRequest.host();
             String httpUrl = mRequest.url();
-            String method = mRequest.method();
-            if ("GET".equalsIgnoreCase(method) || "DELETE".equalsIgnoreCase(method)) {
+            String method = mRequest.method().toUpperCase();
+            if ("GET".equals(method) || "DELETE".equals(method)) {
                 if (mRequest.params() != null && mRequest.params().getTextParams() != null) {
                     String paramsStr = mRequest.content().intoString();
                     httpUrl = httpUrl + (httpUrl.endsWith("?") ? paramsStr : "?" + paramsStr);
                 }
             }
             URL url = new URL(httpUrl);
-            if (host == null)
+            if (host == null && mClient.getProxy() == null) {
                 mUrlConnection = url.openConnection();
-            else
-                mUrlConnection = url.openConnection(new Proxy(Proxy.Type.HTTP, new InetSocketAddress(host, mRequest.port())));
+            } else {
+                mUrlConnection = url.openConnection(host != null ? new Proxy(Proxy.Type.HTTP, new InetSocketAddress(host, mRequest.port())) : mClient.getProxy());
+            }
 
             initConnection();
             initHeaders();
             initMethod(method);
 
-            if ("POST".equalsIgnoreCase(method))
+            if ("POST".equals(method))
                 post(callBack);
             else if ("GET".equals(method))
                 get(callBack);

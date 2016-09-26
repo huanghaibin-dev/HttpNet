@@ -22,6 +22,7 @@ import com.haibin.httpnet.core.call.RealCall;
 import com.haibin.httpnet.core.connect.SSLManager;
 
 import java.io.InputStream;
+import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.security.GeneralSecurityException;
 
@@ -57,6 +58,10 @@ public final class HttpNetClient {
 
     public void setProxy(Proxy proxy) {
         this.mProxy = proxy;
+    }
+
+    public void setProxy(String host, int port) {
+        this.mProxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(host, port));
     }
 
     public HttpNetClient setSslSocketFactory(SSLSocketFactory sslSocketFactory) {

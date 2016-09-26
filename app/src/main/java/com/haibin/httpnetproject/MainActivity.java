@@ -26,6 +26,8 @@ import com.squareup.okhttp.OkHttpClient;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.InetSocketAddress;
+import java.net.Proxy;
 import java.security.KeyStore;
 import java.security.SecureRandom;
 import java.security.cert.CertificateFactory;
@@ -81,13 +83,15 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Exception e) {
-
+                Log.e("response",e.getMessage());
             }
         });
 
         HttpNetClient client1 = new HttpNetClient();
+        client1.setProxy(new Proxy(Proxy.Type.HTTP, new InetSocketAddress("192.168.1.55",8888)));
         Request request1 = new Request.Builder()
-                .url("https://www.baidu.com")
+                .url("http://blog.csdn.net/qiujuer/article/details/42506741")
+                //.proxy("192.168.1.55",8888)
                 .build();
         client1.newCall(request1).execute(new CallBack() {
             @Override
