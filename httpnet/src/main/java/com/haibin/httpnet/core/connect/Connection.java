@@ -15,6 +15,7 @@
  */
 package com.haibin.httpnet.core.connect;
 
+import com.haibin.httpnet.HttpNetClient;
 import com.haibin.httpnet.builder.Headers;
 import com.haibin.httpnet.builder.Request;
 import com.haibin.httpnet.builder.RequestParams;
@@ -45,6 +46,11 @@ public abstract class Connection {
     protected DataOutputStream mOutputStream;
     protected InputStream mInputStream;
     protected URLConnection mUrlConnection;
+    protected HttpNetClient mClient;
+
+    public Connection(HttpNetClient client){
+        this.mClient = client;
+    }
 
     public void connect(Request request, CallBack callBack) {
         this.mRequest = request;

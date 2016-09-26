@@ -8,19 +8,14 @@
     tools:context="com.haibin.httpnetproject.MainActivity">
 
     <Button
-        android:onClick="onClick"
-        android:text="execute"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:onClick="onClick"
+        android:text="execute" />
+
     <TextView
         android:id="@+id/text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello World!" />
-    <ImageView
-        android:id="@+id/iv"
-        android:layout_gravity="center"
-        android:layout_marginTop="20dp"
-        android:layout_width="300dp"
-        android:layout_height="300dp" />
+        android:text="home activity" />
 </LinearLayout>

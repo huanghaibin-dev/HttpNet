@@ -19,15 +19,28 @@ import com.haibin.httpnet.builder.Request;
 import com.haibin.httpnet.core.Dispatcher;
 import com.haibin.httpnet.core.call.Call;
 import com.haibin.httpnet.core.call.RealCall;
+import com.haibin.httpnet.core.connect.SSLManager;
+
+import java.io.InputStream;
+import java.net.Proxy;
+import java.security.GeneralSecurityException;
+
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocketFactory;
 
 /**
- *
+ * Http客户端
  */
 public final class HttpNetClient {
     private Dispatcher mDispatcher;
 
+    private Proxy mProxy;//为当前客户端开启全局代理
+
+    private SSLManager mSslManager;
+
     public HttpNetClient() {
         mDispatcher = new Dispatcher();
+        mSslManager = new SSLManager();
     }
 
     public Call newCall(Request request) {
@@ -36,5 +49,37 @@ public final class HttpNetClient {
 
     public Dispatcher dispatcher() {
         return mDispatcher;
+    }
+
+    public Proxy getProxy() {
+        return mProxy;
+    }
+
+    public void setProxy(Proxy proxy) {
+        this.mProxy = proxy;
+    }
+
+    public HttpNetClient setSslSocketFactory(SSLSocketFactory sslSocketFactory) {
+        mSslManager.setSslSocketFactory(sslSocketFactory);
+        return this;
+    }
+
+    public HttpNetClient setSslSocketFactory(InputStream... cerInputStream) {
+        mSslManager.setSslSocketFactory(cerInputStream);
+        return this;
+    }
+
+    public HttpNetClient setSslSocketFactory(String... cerPaths) {
+        mSslManager.setSslSocketFactory(cerPaths);
+        return this;
+    }
+
+    public HttpNetClient setSslSocketFactoryAsString(String... cerValues) {
+        mSslManager.setSslSocketFactoryAsString(cerValues);
+        return this;
+    }
+
+    public SSLSocketFactory getSslSocketFactory() {
+        return mSslManager.getSslSocketFactory();
     }
 }

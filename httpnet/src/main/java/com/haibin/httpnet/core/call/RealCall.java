@@ -34,7 +34,7 @@ public class RealCall implements Call {
     @Override
     public void execute(CallBack callBack) {
         if (mAsyncCall == null)
-            mAsyncCall = new AsyncCall(mRequest, callBack);
+            mAsyncCall = new AsyncCall(mClient, mRequest, callBack);
         mClient.dispatcher().enqueue(mAsyncCall);
     }
 

@@ -28,4 +28,7 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile project(':httpnet')
     compile 'com.squareup.okhttp:okhttp:2.4.0'
+    debugCompile 'com.squareup.leakcanary:leakcanary-android:1.4'
+    releaseCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.4'
+    testCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.4'
 }

@@ -15,6 +15,8 @@
  */
 package com.haibin.httpnet.core.connect;
 
+import com.haibin.httpnet.HttpNetClient;
+
 import java.io.IOException;
 import java.net.ProtocolException;
 
@@ -27,7 +29,8 @@ import javax.net.ssl.HttpsURLConnection;
 public class HttpsConnection extends Connection {
     private HttpsURLConnection mConnection;
 
-    public HttpsConnection() {
+    public HttpsConnection(HttpNetClient client) {
+        super(client);
     }
 
     @Override
@@ -43,5 +46,6 @@ public class HttpsConnection extends Connection {
     @Override
     protected void convertConnect() {
         mConnection = (HttpsURLConnection) mUrlConnection;
+        mConnection.setSSLSocketFactory(mClient.getSslSocketFactory());
     }
 }

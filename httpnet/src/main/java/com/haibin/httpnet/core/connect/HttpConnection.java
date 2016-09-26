@@ -15,6 +15,8 @@
  */
 package com.haibin.httpnet.core.connect;
 
+import com.haibin.httpnet.HttpNetClient;
+
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.ProtocolException;
@@ -25,6 +27,10 @@ import java.net.ProtocolException;
 
 public class HttpConnection extends Connection {
     private HttpURLConnection mConnection;
+
+    public HttpConnection(HttpNetClient client) {
+        super(client);
+    }
 
     @Override
     protected void convertConnect() {
