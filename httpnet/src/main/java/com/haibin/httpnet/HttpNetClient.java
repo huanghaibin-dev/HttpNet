@@ -24,14 +24,13 @@ import com.haibin.httpnet.core.connect.SSLManager;
 import java.io.InputStream;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
-import java.security.GeneralSecurityException;
 
-import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
 
 /**
  * Http客户端
  */
+@SuppressWarnings("unused")
 public final class HttpNetClient {
     private Dispatcher mDispatcher;
 
