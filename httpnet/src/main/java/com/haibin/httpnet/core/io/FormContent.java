@@ -55,4 +55,9 @@ public class FormContent extends HttpContent {
         intoString(buffer);
         return buffer.substring(0, buffer.length() - 1);
     }
+
+    @Override
+    public long getContentLength() {
+        return intoString().length();
+    }
 }

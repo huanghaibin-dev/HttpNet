@@ -40,6 +40,6 @@ public class RealCall implements Call {
 
     @Override
     public void cancel() {
-
+        mAsyncCall.getConnection().disConnect();
     }
 }

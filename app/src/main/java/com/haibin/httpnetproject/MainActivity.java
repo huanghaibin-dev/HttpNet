@@ -3,44 +3,37 @@ package com.haibin.httpnetproject;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.haibin.httpnet.HttpNetClient;
 import com.haibin.httpnet.builder.Headers;
 import com.haibin.httpnet.builder.Request;
 import com.haibin.httpnet.builder.RequestParams;
 import com.haibin.httpnet.core.Response;
+import com.haibin.httpnet.core.call.Call;
 import com.haibin.httpnet.core.call.CallBack;
-import com.haibin.httpnet.core.connect.SSLManager;
-import com.haibin.httpnet.core.io.IO;
-import com.haibin.httpnet.core.io.JsonContent;
-import com.squareup.leakcanary.LeakCanary;
-import com.squareup.okhttp.Callback;
-import com.squareup.okhttp.OkHttpClient;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.InetSocketAddress;
-import java.net.Proxy;
-import java.security.KeyStore;
-import java.security.SecureRandom;
-import java.security.cert.CertificateFactory;
-import java.security.cert.X509Certificate;
-
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManagerFactory;
 
 public class MainActivity extends AppCompatActivity {
 
-    ImageView iv;
-    TextView text;
-    Handler handler = new Handler();
+    private ImageView iv;
+    private TextView text;
+    private Handler handler = new Handler();
+    private Call callExe;
+
+    private Call callDownload;
+
+    HttpNetClient client = new HttpNetClient();
 
     public static void show(Activity activity) {
         Intent intent = new Intent(activity, MainActivity.class);
@@ -58,79 +51,39 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onClick(View v) {
-        httpNet();
-    }
-
-    public void httpNet() {
-        HttpNetClient client = new HttpNetClient();
-        try {
-            InputStream is1 = getAssets().open("12306.cer");
-            InputStream is2 = getAssets().open("google.cer");
-            client.setSslSocketFactory(is1, is2);
-        } catch (Exception e) {
-            e.printStackTrace();
+        switch (v.getId()) {
+            case R.id.btn_execute:
+                httpPost();
+                break;
+            case R.id.btn_cancel:
+                if (callExe != null) {
+                    callExe.cancel();
+                }
+                if (callDownload != null) {
+                    callDownload.cancel();
+                }
+                break;
+            case R.id.btn_download:
+                httpDownload();
+                break;
         }
-        Request request = new Request.Builder()
-                .url("https://kyfw.12306.cn/otn")
-                .build();
-        client.newCall(request).execute(new CallBack() {
-            @Override
-            public void onResponse(Response response) {
-                if (response != null) {
-                    Log.e("response",response.getBody());
-                }
-            }
-
-            @Override
-            public void onFailure(Exception e) {
-                Log.e("response",e.getMessage());
-            }
-        });
-
-        HttpNetClient client1 = new HttpNetClient();
-        client1.setProxy(new Proxy(Proxy.Type.HTTP, new InetSocketAddress("192.168.1.55",8888)));
-        Request request1 = new Request.Builder()
-                .url("http://blog.csdn.net/qiujuer/article/details/42506741")
-                //.proxy("192.168.1.55",8888)
-                .build();
-        client1.newCall(request1).execute(new CallBack() {
-            @Override
-            public void onResponse(Response response) {
-                if (response != null) {
-                    Log.e("response",response.getBody());
-                }
-            }
-
-            @Override
-            public void onFailure(Exception e) {
-                Log.e("response",e.getMessage());
-            }
-        });
     }
 
-    public void okHttp() {
-        final HttpNetClient client = new HttpNetClient();
-        //AppContext.getRefWatcher().watch(client);
+    public void httpPost() {
 
-        final Headers.Builder builder = new Headers.Builder()
-//                .addHeader("Content-Type","application/json; charset=utf-8")
-//                .addHeader("X-Requested-With","XMLHttpRequest")
-                .addHeader("Cookie", "");
-
+        Headers.Builder header = new Headers.Builder()
+                .addHeader("Cookie", ".CNBlogsCookie=FF856CE1EB117C096AEEDAD923D81F64D1495E1CC50A7B54940F6996A510F87D7326E98101CE99AC2A1ACAF225064F151F77EFD6F3E9A59D78CFAC8013901E2FF858BEB0A12EA63AA9FDBA5AE23C0E9A3FE51D9C16273CC8EA6D1967DACF2D03D6114065; _gat=1; _ga=GA1.2.2128538109.1473746167");
         RequestParams params = new RequestParams()
-                .put("remember_me", true)
-                .put("phone_num", "15018084713")
-                .put("password", "wh.738539302");
-
+                .putFile("qqfile", "/storage/emulated/0/DCIM/Camera/IMG_20160909_084119.jpg");
         Request request = new Request.Builder()
-                .encode("UTF-8")
-                .method("POST")
-                .timeout(13000)
-                //.headers(builder)
+                .url("http://upload.cnblogs.com/ImageUploader/TemporaryAvatarUpload")
+                .headers(header)
                 .params(params)
-                .url("https://www.zhihu.com/login/phone_num")
+                .method("POST")
                 .build();
-        client.newCall(request).execute(new CallBack() {
+
+        callExe = client.newCall(request);
+        callExe.execute(new CallBack() {
             @Override
             public void onResponse(Response response) {
                 if (response != null) {
@@ -140,35 +93,43 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Exception e) {
-
+                Log.e("response", e.getMessage());
             }
         });
     }
 
-    public static void setSslSocketFactory(OkHttpClient client, InputStream... cerInputStream) {
-        try {
-            CertificateFactory certificatefactory = CertificateFactory.getInstance("X.509");
-            KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
-            keyStore.load(null);
-            int index = 0;
-            for (InputStream is : cerInputStream) {
-                X509Certificate cert = (X509Certificate) certificatefactory.generateCertificate(is);
-                keyStore.setCertificateEntry("alias" + index++, cert);
+    public void httpDownload() {
+        Request request = new Request.Builder()
+                .url("http://f3.market.xiaomi.com/download/AppStore/0b3f6b4e06ff14b61065972a96149da822c86ad40/com.eg.android.AlipayGphone.apk")
+                .method("GET")
+                .build();
+        callDownload = client.newCall(request);
+        callDownload.execute(new CallBack() {
+            @Override
+            public void onResponse(Response response) {
+                try {
+                    InputStream is = response.toStream();
+                    File file = new File(Environment.getExternalStorageDirectory().getPath() + "/alipay.apk");
+                    FileOutputStream os = new FileOutputStream(file);
+                    int length = response.getContentLength();
+                    int p = 0;
+                    int bytes = 0;
+                    byte[] buffer = new byte[1024];
+                    while ((bytes = is.read(buffer)) != -1) {
+                        os.write(buffer, 0, bytes);
+                        p += bytes;
+                        Log.e("progress", "进度==    " + (p / (float) length) * 100 + "%");
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    Log.e("Exception", e.getMessage());
+                }
             }
 
-            SSLContext sslContext = SSLContext.getInstance("TLS");//安全数据层
-
-            TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());//信任证书管理工厂
-
-            trustManagerFactory.init(keyStore);
-
-            sslContext.init(null, trustManagerFactory.getTrustManagers(), new SecureRandom());
-
-            client.setSslSocketFactory(sslContext.getSocketFactory());
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            IO.close(cerInputStream);
-        }
+            @Override
+            public void onFailure(Exception e) {
+                Log.e("Exception", e.getMessage());
+            }
+        });
     }
 }

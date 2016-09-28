@@ -40,6 +40,7 @@ import java.util.Set;
 /**
  * 链接对象
  */
+@SuppressWarnings("unused")
 public abstract class Connection {
     protected Request mRequest;
     protected DataOutputStream mOutputStream;
@@ -83,7 +84,7 @@ public abstract class Connection {
             else if ("DELETE".equals(method))
                 delete(callBack);
             mInputStream = mUrlConnection.getInputStream();
-            callBack.onResponse(new Response(getResponseCode(), mInputStream, mUrlConnection.getHeaderFields(), mRequest.encode()));
+            callBack.onResponse(new Response(getResponseCode(), mInputStream, mUrlConnection.getHeaderFields(), mRequest.encode(),mUrlConnection.getContentLength()));
         } catch (IOException e) {
             e.printStackTrace();
             callBack.onFailure(e);
@@ -172,5 +173,9 @@ public abstract class Connection {
      */
     protected void finish() {
         IO.close(mOutputStream, mInputStream);
+    }
+
+    public void disConnect(){
+
     }
 }

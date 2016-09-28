@@ -52,4 +52,9 @@ public class JsonContent extends HttpContent {
     public String intoString() {
         return mJson;
     }
+
+    @Override
+    public long getContentLength() {
+        return mJson.length();
+    }
 }

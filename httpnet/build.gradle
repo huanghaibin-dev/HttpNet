@@ -7,8 +7,8 @@ android {
     defaultConfig {
         minSdkVersion 9
         targetSdkVersion 23
-        versionCode 1
-        versionName "1.0"
+        versionCode 105
+        versionName "1.0.5"
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
@@ -43,5 +43,6 @@ dependencies {
     })
     testCompile 'junit:junit:4.12'
     compile 'com.google.code.gson:gson:2.7'
+
 }
 apply from: '../script/gradle-jcenter-push.gradle'

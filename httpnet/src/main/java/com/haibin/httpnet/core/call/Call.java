@@ -21,5 +21,5 @@ package com.haibin.httpnet.core.call;
 public interface Call {
     void execute(CallBack callBack);
 
-    void cancel();
+    void cancel();//取消一个http请求
 }

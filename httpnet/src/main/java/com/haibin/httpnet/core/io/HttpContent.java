@@ -18,15 +18,19 @@ package com.haibin.httpnet.core.io;
 import com.haibin.httpnet.builder.RequestParams;
 
 import java.io.DataOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * 定义HttpContent 传输数据
  */
 public abstract class HttpContent {
-    public static final String BOUNDARY = "http-net-client for java";
+    public static final String BOUNDARY = "http-net";
     public static final String DATA_TAG = "--";
     public static final String END = "\r\n";
     protected String mEncode;
@@ -72,5 +76,9 @@ public abstract class HttpContent {
         mOutputStream.writeBytes(END + DATA_TAG + BOUNDARY + DATA_TAG + END);
         mOutputStream.flush();
         mOutputStream.close();
+    }
+
+    public long getContentLength() {
+        return 0;
     }
 }

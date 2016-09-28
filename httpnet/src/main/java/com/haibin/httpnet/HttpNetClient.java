@@ -47,6 +47,10 @@ public final class HttpNetClient {
         return new RealCall(this, request);
     }
 
+    public Call newCall(String url) {
+        return new RealCall(this, getDefaultRequest(url));
+    }
+
     public Dispatcher dispatcher() {
         return mDispatcher;
     }
@@ -85,5 +89,11 @@ public final class HttpNetClient {
 
     public SSLSocketFactory getSslSocketFactory() {
         return mSslManager.getSslSocketFactory();
+    }
+
+    Request getDefaultRequest(String url) {
+        return new Request.Builder()
+                .url(url)
+                .build();
     }
 }

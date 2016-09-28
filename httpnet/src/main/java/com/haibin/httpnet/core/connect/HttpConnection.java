@@ -35,6 +35,10 @@ public class HttpConnection extends Connection {
     @Override
     protected void convertConnect() {
         mConnection = (HttpURLConnection) mUrlConnection;
+        mConnection.setRequestProperty("Cache-Control", "no-cache");
+        mConnection.setUseCaches(false);
+        mConnection.setAllowUserInteraction(false);
+        mConnection.setChunkedStreamingMode(1024);
     }
 
     @Override
@@ -48,8 +52,8 @@ public class HttpConnection extends Connection {
     }
 
     @Override
-    protected void finish() {
-        super.finish();
-        mConnection.disconnect();
+    public void disConnect() {
+        if (mConnection != null)
+            mConnection.disconnect();
     }
 }

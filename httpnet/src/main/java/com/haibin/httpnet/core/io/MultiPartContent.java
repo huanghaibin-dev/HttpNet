@@ -15,6 +15,7 @@
  */
 package com.haibin.httpnet.core.io;
 
+import com.haibin.httpnet.core.ProgressListener;
 import com.haibin.httpnet.builder.RequestParams;
 import com.haibin.httpnet.core.ContentTypeFactory;
 
@@ -76,12 +77,23 @@ public class MultiPartContent extends HttpContent {
 
     private void outputFile(File file) throws IOException {
         DataInputStream in = new DataInputStream(new FileInputStream(file));
+        long p = 0;
+        long length = file.length();
+        ProgressListener listener = null;
         int bytes = 0;
+        onProgress(listener, p, length);
         byte[] bufferOut = new byte[1024 * 10];
         while ((bytes = in.read(bufferOut)) != -1) {
             mOutputStream.write(bufferOut, 0, bytes);
+            p += bytes;
+            onProgress(listener, p, length);
         }
         in.close();
+    }
+
+    private void onProgress(ProgressListener listener, long currentLength, long allLength) {
+        if (listener != null)
+            listener.onProgress(currentLength, allLength);
     }
 
     private void intoString(StringBuffer buffer) {
@@ -99,5 +111,31 @@ public class MultiPartContent extends HttpContent {
         StringBuffer buffer = new StringBuffer();
         intoString(buffer);
         return buffer.substring(0, buffer.length() - 1);
+    }
+
+    @Override
+    public long getContentLength() {
+        long length = 0;
+        Map<String, String> text = mParams.getTextParams();
+        Map<String, File> multi = mParams.getMultiParams();
+        if (text != null) {
+            Set<String> set = text.keySet();
+            for (Iterator<String> iterator = set.iterator(); iterator.hasNext(); ) {
+                length += (END + DATA_TAG + BOUNDARY + END + "Content-Disposition: form-data; name=\"" + iterator.next() + "\"" + END + END).length();
+            }
+        }
+        if (multi != null) {
+            Set<String> set = multi.keySet();
+            for (Iterator<String> iterator = set.iterator(); iterator.hasNext(); ) {
+                String key = iterator.next();
+                File file = multi.get(key);
+                String fileName = file.getName();
+                length += ("Content-Disposition: form-data; name=\"" + key + "\"; filename=\"" + fileName + "\""
+                        + END
+                        + "Content-Type: " + ContentTypeFactory.getInstance().getContentType(fileName)
+                        + END + END).length() + file.length();
+            }
+        }
+        return length;
     }
 }

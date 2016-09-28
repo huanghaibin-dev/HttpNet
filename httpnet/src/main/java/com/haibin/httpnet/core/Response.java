@@ -31,12 +31,14 @@ public class Response {
     private String mBody;
     private InputStream mInputStream;
     private String mEncode;
+    private int mContentLength;
 
-    public Response(int code, InputStream is, Map<String, List<String>> headers, String encode) {
+    public Response(int code, InputStream is, Map<String, List<String>> headers, String encode, int contentLength) {
         this.mCode = code;
         this.mInputStream = is;
         this.mHeaders = headers;
         this.mEncode = encode;
+        this.mContentLength = contentLength;
     }
 
     public int getCode() {
@@ -65,5 +67,9 @@ public class Response {
 
     public Map<String, List<String>> getHeaders() {
         return mHeaders;
+    }
+
+    public int getContentLength() {
+        return mContentLength;
     }
 }

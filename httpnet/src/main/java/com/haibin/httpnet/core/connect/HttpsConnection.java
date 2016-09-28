@@ -48,4 +48,10 @@ public class HttpsConnection extends Connection {
         mConnection = (HttpsURLConnection) mUrlConnection;
         mConnection.setSSLSocketFactory(mClient.getSslSocketFactory());
     }
+
+    @Override
+    public void disConnect() {
+        if (mConnection != null)
+            mConnection.disconnect();
+    }
 }
