@@ -1,5 +1,5 @@
 #HttpNet项目结构如下
-![输入图片说明](http://git.oschina.net/uploads/images/2016/0919/132807_3e935005_494015.png "在这里输入图片标题")
+![HttpNet项目结构](http://git.oschina.net/uploads/images/2016/0919/132807_3e935005_494015.png "HttpNet项目结构")
 
 HttpNet网络请求框架基于HttpUrlConnection，采用Client + Request + Call的请求模型，支持https默认证书，数字安全证书！后续将会实现队列、缓存模块。
 
@@ -19,7 +19,8 @@ client.setSslSocketFactory(getAssets().open("12306.cer"));//证书文件输入�
 client.setSslSocketFactory("filepath/12306.cer");//证书路径
 client.setSslSocketFactoryAsString("cerValue");//证书文本
 
-//注意，添加多个证书只能调用该方法一次，可以使用如下方式添加多个证书,该客户端导入证书之后将不能访问其它没有导入https的链接，可以重新创建一个HttpNetClient即可
+/*注意，添加多个证书只能调用该方法一次，可以使用如下方式添加多个证书,该客户端导入证书之后将不能访问其它没有导入https的链接，
+可以重新创建一个HttpNetClient反问新的https即可*/
 
 InputStream is12306 = getAssets().open("12306.cer");
 InputStream isGoogle = getAssets().open("google.cer");
@@ -85,7 +86,7 @@ client.newCall(request).execute(new CallBack() {
             @Override
             public void onResponse(Response response) {
                 String body = response.getBody();
-                InputStream is = response.toStream();//如果采用下载
+                InputStream is = response.toStream();//如果采用下载，可以在这里监听下载进度
             }
 
             @Override
