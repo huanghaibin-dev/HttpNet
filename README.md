@@ -19,8 +19,8 @@ client.setSslSocketFactory(getAssets().open("12306.cer"));//证书文件输入�
 client.setSslSocketFactory("filepath/12306.cer");//证书路径
 client.setSslSocketFactoryAsString("cerValue");//证书文本
 
-//注意，添加多个证书只能调用该方法一次，可以使用如下方式添加多个证书,该客户端导入证书之后将不能访问其它没有导入https的链接，
-可以重新创建一个HttpNetClient反问新的https即可
+/*注意，添加多个证书只能调用该方法一次，可以使用如下方式添加多个证书,该客户端导入证书之后将不能访问其它没有导入https的链接，
+可以重新创建一个HttpNetClient反问新的https即可*/
 
 InputStream is12306 = getAssets().open("12306.cer");
 InputStream isGoogle = getAssets().open("google.cer");
