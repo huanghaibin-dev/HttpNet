@@ -86,7 +86,7 @@ client.newCall(request).execute(new CallBack() {
             @Override
             public void onResponse(Response response) {
                 String body = response.getBody();
-                InputStream is = response.toStream();//如果采用下载
+                InputStream is = response.toStream();//如果采用下载，可以在这里监听下载进度
             }
 
             @Override
