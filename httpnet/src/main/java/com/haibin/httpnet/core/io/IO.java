@@ -19,7 +19,7 @@ import java.io.Closeable;
 import java.io.IOException;
 
 /**
- * IO
+ * IO流操作
  */
 
 public final class IO {

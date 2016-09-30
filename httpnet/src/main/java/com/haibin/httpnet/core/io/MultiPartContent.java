@@ -28,7 +28,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- *
+ * HTTP MultiPart RequestBody，请全体包括文本、文件流等
  */
 public class MultiPartContent extends HttpContent {
     public MultiPartContent(RequestParams params, String encode) {

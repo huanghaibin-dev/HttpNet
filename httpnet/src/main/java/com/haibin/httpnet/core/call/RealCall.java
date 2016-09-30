@@ -42,4 +42,9 @@ public class RealCall implements Call {
     public void cancel() {
         mAsyncCall.getConnection().disConnect();
     }
+
+    @Override
+    public boolean equals(Object o) {
+        return super.equals(o);
+    }
 }

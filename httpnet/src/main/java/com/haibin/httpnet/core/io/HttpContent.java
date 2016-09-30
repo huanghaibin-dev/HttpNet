@@ -27,7 +27,11 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * 定义HttpContent 传输数据
+ *
+ *                                            ***** FormContent
+ * 定义HttpContent 传输数据，使用策略模式 ********* JsonContent
+ *                                            ***** MultiPartContent
+ *
  */
 public abstract class HttpContent {
     public static final String BOUNDARY = "http-net";

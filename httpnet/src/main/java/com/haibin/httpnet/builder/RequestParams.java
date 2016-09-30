@@ -62,7 +62,7 @@ public final class RequestParams {
     public RequestParams putFile(String name, File file) {
         if (multiParams == null) multiParams = new HashMap<>();
         if (!file.exists())
-            throw new IllegalArgumentException("request param file not find exception");
+            return this;//throw new IllegalArgumentException("request param file not find exception");
         multiParams.put(name, file);
         return this;
     }

@@ -23,6 +23,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.util.Map;
 
+/**
+ * 报文数据中的Content-Type格式，支持所有文件
+ */
 public class ContentTypeFactory {
     private Map<String, String> mTypeMap;
     private static ContentTypeFactory mInstance = new ContentTypeFactory();

@@ -38,7 +38,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * 链接对象
+ * 链接对象，使用策略模式
  */
 @SuppressWarnings("unused")
 public abstract class Connection {

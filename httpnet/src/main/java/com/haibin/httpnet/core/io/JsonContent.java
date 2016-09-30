@@ -18,7 +18,7 @@ package com.haibin.httpnet.core.io;
 import java.io.IOException;
 
 /**
- * Json
+ * Json POST请求
  */
 public class JsonContent extends HttpContent {
     private String mJson;
