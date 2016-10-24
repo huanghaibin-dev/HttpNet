@@ -44,7 +44,9 @@ public class JsonContent extends HttpContent {
 
     @Override
     public void doOutput() throws IOException {
-        mOutputStream.write(mJson.getBytes(mEncode));
+        if (mJson != null) {
+            mOutputStream.write(mJson.getBytes(mEncode));
+        }
         //outputEnd();
     }
 

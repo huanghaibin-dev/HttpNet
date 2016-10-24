@@ -58,7 +58,7 @@ public abstract class Connection {
             String host = mRequest.host();
             String httpUrl = mRequest.url();
             String method = mRequest.method().toUpperCase();
-            if ("GET".equals(method) || "DELETE".equals(method)) {
+            if ("GET".equals(method) || "DELETE".equals(method) || "PATCH".equals(method)) {
                 if (mRequest.params() != null && mRequest.params().getTextParams() != null) {
                     String paramsStr = mRequest.content().intoString();
                     httpUrl = httpUrl + (httpUrl.endsWith("?") ? paramsStr : "?" + paramsStr);
@@ -84,7 +84,7 @@ public abstract class Connection {
             else if ("DELETE".equals(method))
                 delete(callBack);
             mInputStream = mUrlConnection.getInputStream();
-            callBack.onResponse(new Response(getResponseCode(), mInputStream, mUrlConnection.getHeaderFields(), mRequest.encode(),mUrlConnection.getContentLength()));
+            callBack.onResponse(new Response(getResponseCode(), mInputStream, mUrlConnection.getHeaderFields(), mRequest.encode(), mUrlConnection.getContentLength()));
         } catch (IOException e) {
             e.printStackTrace();
             callBack.onFailure(e);
@@ -107,7 +107,10 @@ public abstract class Connection {
         mUrlConnection.setDoOutput(true);
         mUrlConnection.setRequestProperty("Content-Type", getContentType());
         mOutputStream = new DataOutputStream(mUrlConnection.getOutputStream());
-        mRequest.content().setOutputStream(mOutputStream);
+        HttpContent body = mRequest.content();
+        if (body != null) {
+            body.setOutputStream(mOutputStream);
+        }
     }
 
     protected void put(CallBack callBack) throws IOException {
@@ -175,7 +178,7 @@ public abstract class Connection {
         IO.close(mOutputStream, mInputStream);
     }
 
-    public void disConnect(){
+    public void disConnect() {
 
     }
 }

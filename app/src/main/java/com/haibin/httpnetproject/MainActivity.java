@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_execute:
-                httpPost();
+                http();
                 break;
             case R.id.btn_cancel:
                 if (callExe != null) {
@@ -79,6 +79,40 @@ public class MainActivity extends AppCompatActivity {
                 .url("http://upload.cnblogs.com/ImageUploader/TemporaryAvatarUpload")
                 .headers(header)
                 .params(params)
+                .method("POST")
+                .build();
+
+        callExe = client.newCall(request);
+        callExe.execute(new CallBack() {
+            @Override
+            public void onResponse(Response response) {
+                if (response != null) {
+                    Log.e("response", response.getBody());
+                }
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                Log.e("response", e.getMessage());
+            }
+        });
+    }
+
+    public void http() {
+
+        Headers.Builder header = new Headers.Builder()
+                .addHeader("cid","11523")
+                .addHeader("client","4")
+                .addHeader("sdk","23,6.0.1")
+                .addHeader("version","624.2")
+                .addHeader("duid","47396906")
+                .addHeader("Cookie", "duid=47396906");
+        RequestParams params = new RequestParams()
+                .put("client", 4);
+        Request request = new Request.Builder()
+                .url("http://api.douguo.net/recipe/home/0/20/1654")
+                .params(params)
+                .headers(header)
                 .method("POST")
                 .build();
 

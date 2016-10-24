@@ -15,9 +15,9 @@
  */
 package com.haibin.httpnet.core.io;
 
-import com.haibin.httpnet.core.ProgressListener;
 import com.haibin.httpnet.builder.RequestParams;
 import com.haibin.httpnet.core.ContentTypeFactory;
+import com.haibin.httpnet.core.ProgressListener;
 
 import java.io.DataInputStream;
 import java.io.File;
@@ -31,6 +31,8 @@ import java.util.Set;
  * HTTP MultiPart RequestBody，请全体包括文本、文件流等
  */
 public class MultiPartContent extends HttpContent {
+    private ProgressListener mListener = null;
+
     public MultiPartContent(RequestParams params, String encode) {
         super(params, encode);
     }
@@ -79,14 +81,13 @@ public class MultiPartContent extends HttpContent {
         DataInputStream in = new DataInputStream(new FileInputStream(file));
         long p = 0;
         long length = file.length();
-        ProgressListener listener = null;
         int bytes = 0;
-        onProgress(listener, p, length);
+        onProgress(mListener, p, length);
         byte[] bufferOut = new byte[1024 * 10];
         while ((bytes = in.read(bufferOut)) != -1) {
             mOutputStream.write(bufferOut, 0, bytes);
             p += bytes;
-            onProgress(listener, p, length);
+            onProgress(mListener, p, length);
         }
         in.close();
     }
