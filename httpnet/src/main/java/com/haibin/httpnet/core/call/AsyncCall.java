@@ -17,9 +17,9 @@ package com.haibin.httpnet.core.call;
 
 import com.haibin.httpnet.HttpNetClient;
 import com.haibin.httpnet.builder.Request;
-import com.haibin.httpnet.core.connect.Connection;
-import com.haibin.httpnet.core.connect.HttpConnection;
-import com.haibin.httpnet.core.connect.HttpsConnection;
+import com.haibin.httpnet.core.connection.Connection;
+import com.haibin.httpnet.core.connection.HttpConnection;
+import com.haibin.httpnet.core.connection.HttpsConnection;
 
 /**
  *

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.haibin.httpnet.core.connect;
+package com.haibin.httpnet.core.connection;
 
 import com.haibin.httpnet.core.io.IO;
 
@@ -49,7 +49,7 @@ public final class SSLManager {
                 sslContext.init(null, null, null);
                 mDefaultSslSocketFactory = sslContext.getSocketFactory();
             } catch (GeneralSecurityException e) {
-                throw new AssertionError(); // The system has no TLS. Just give up.
+                throw new AssertionError();
             }
         }
         return mDefaultSslSocketFactory;

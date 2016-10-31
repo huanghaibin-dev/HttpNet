@@ -19,7 +19,7 @@ import com.haibin.httpnet.builder.Request;
 import com.haibin.httpnet.core.Dispatcher;
 import com.haibin.httpnet.core.call.Call;
 import com.haibin.httpnet.core.call.RealCall;
-import com.haibin.httpnet.core.connect.SSLManager;
+import com.haibin.httpnet.core.connection.SSLManager;
 
 import java.io.InputStream;
 import java.net.InetSocketAddress;

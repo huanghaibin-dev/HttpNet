@@ -7,14 +7,12 @@ import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.haibin.httpnet.HttpNetClient;
 import com.haibin.httpnet.builder.Request;
 import com.haibin.httpnet.core.Response;
 import com.haibin.httpnet.core.call.CallBack;
-import com.haibin.httpnet.core.connect.SSLManager;
 
 import java.io.IOException;
 import java.io.InputStream;

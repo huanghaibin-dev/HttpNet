@@ -41,6 +41,7 @@ import java.util.Set;
  * 链接对象，使用策略模式
  */
 @SuppressWarnings("unused")
+@Deprecated
 public abstract class Connection {
     protected Request mRequest;
     protected DataOutputStream mOutputStream;
@@ -172,7 +173,7 @@ public abstract class Connection {
     }
 
     /**
-     *
+     * 结束时调用
      */
     protected void finish() {
         IO.close(mOutputStream, mInputStream);

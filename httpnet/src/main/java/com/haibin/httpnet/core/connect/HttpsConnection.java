@@ -25,7 +25,7 @@ import javax.net.ssl.HttpsURLConnection;
 /**
  * https
  */
-
+@Deprecated
 public class HttpsConnection extends Connection {
     private HttpsURLConnection mConnection;
 

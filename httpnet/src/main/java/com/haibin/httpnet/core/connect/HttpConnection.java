@@ -24,7 +24,7 @@ import java.net.ProtocolException;
 /**
  * http
  */
-
+@Deprecated
 public class HttpConnection extends Connection {
     private HttpURLConnection mConnection;
 

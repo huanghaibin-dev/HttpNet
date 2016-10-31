@@ -2,6 +2,8 @@ package com.haibin.httpnetproject;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -14,10 +16,10 @@ import android.widget.TextView;
 import com.haibin.httpnet.HttpNetClient;
 import com.haibin.httpnet.builder.Headers;
 import com.haibin.httpnet.builder.Request;
-import com.haibin.httpnet.builder.RequestParams;
 import com.haibin.httpnet.core.Response;
 import com.haibin.httpnet.core.call.Call;
 import com.haibin.httpnet.core.call.CallBack;
+import com.haibin.httpnet.core.io.JsonContent;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -46,14 +48,13 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         iv = (ImageView) findViewById(R.id.iv);
         text = (TextView) findViewById(R.id.text);
-        //LeakSingle.getInstance(this.getApplication()).setRetainedTextView(text);
         AppContext.getRefWatcher().watch(this);
     }
 
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_execute:
-                http();
+                httpPostJson();
                 break;
             case R.id.btn_cancel:
                 if (callExe != null) {
@@ -69,75 +70,61 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void httpPost() {
+    public void httpPostJson() {
 
         Headers.Builder header = new Headers.Builder()
-                .addHeader("Cookie", ".CNBlogsCookie=FF856CE1EB117C096AEEDAD923D81F64D1495E1CC50A7B54940F6996A510F87D7326E98101CE99AC2A1ACAF225064F151F77EFD6F3E9A59D78CFAC8013901E2FF858BEB0A12EA63AA9FDBA5AE23C0E9A3FE51D9C16273CC8EA6D1967DACF2D03D6114065; _gat=1; _ga=GA1.2.2128538109.1473746167");
-        RequestParams params = new RequestParams()
-                .putFile("qqfile", "/storage/emulated/0/DCIM/Camera/IMG_20160909_084119.jpg");
+                .addHeader("Cookie", "_ga=GA1.2.2128538109.1473746167; pgv_pvi=9544373248; SERVERID=d0849c852e6ab8cf0cebe3fa386ea513|1477908232|1477908230")
+                .addHeader("X-Requested-With", "XMLHttpRequest")
+                .addHeader("Content-Type", "application/json; charset=UTF-8");
+
         Request request = new Request.Builder()
-                .url("http://upload.cnblogs.com/ImageUploader/TemporaryAvatarUpload")
-                .headers(header)
-                .params(params)
+                .url("https://passport.cnblogs.com/user/signin")
+                .content(new JsonContent("{\"input1\":\"kV/jhKdvBcnLjutqHSIG2KbTchONKXgGX3EgSKKo6z1Xb0Jk6x04+4xeu1VPONYJTazlUTuxpsyNSOAv08uOlxBDcO988rMDO/6b/B5Ozjw9WJqK73h3FnY4kbz0qCT9jCyC0X1mSNoRLh88yE1XtiQoJSLvAWfX/PZ3zYTmAT4=\",\"input2\":\"DTQ2iCphxVXZ/gYT6SMeJ0w/NaH/U+zWb9CRX8CbriAr3GLGp+StPSZw+cWK01DktC/b7XlZasQvji9NCOWYcz2Z3ppSnXmSJbKqgwHHOqI2Pezte15A/qx5Qfr3KlwdbE8Pr6v2uZSLOo/lLrurxxoQnRsyTjeQz1z8sgfqhms=\",\"remember\":false}"))
                 .method("POST")
+                .headers(header)
                 .build();
+        client.newCall(request)
+                .execute(new CallBack() {
+                    @Override
+                    public void onResponse(Response response) {
+                        Log.e("onResponse", response.getBody());
+                    }
 
-        callExe = client.newCall(request);
-        callExe.execute(new CallBack() {
-            @Override
-            public void onResponse(Response response) {
-                if (response != null) {
-                    Log.e("response", response.getBody());
-                }
-            }
-
-            @Override
-            public void onFailure(Exception e) {
-                Log.e("response", e.getMessage());
-            }
-        });
+                    @Override
+                    public void onFailure(Exception e) {
+                        Log.e("onFailure", e.getMessage());
+                    }
+                });
     }
 
-    public void http() {
+    public void httpGet() {
+        client.newCall("http://img.pconline.com.cn/images/upload/upc/tx/wallpaper/1306/27/c4/22626360_1372304637240_800x800.jpg")
+                .execute(new CallBack() {
+                    @Override
+                    public void onResponse(Response response) {
+                        if (response != null) {
+                            InputStream is = response.toStream();
 
-        Headers.Builder header = new Headers.Builder()
-                .addHeader("cid","11523")
-                .addHeader("client","4")
-                .addHeader("sdk","23,6.0.1")
-                .addHeader("version","624.2")
-                .addHeader("duid","47396906")
-                .addHeader("Cookie", "duid=47396906");
-        RequestParams params = new RequestParams()
-                .put("client", 4);
-        Request request = new Request.Builder()
-                .url("http://api.douguo.net/recipe/home/0/20/1654")
-                .params(params)
-                .headers(header)
-                .method("POST")
-                .build();
+                            final Bitmap bitmap = BitmapFactory.decodeStream(is);
 
-        callExe = client.newCall(request);
-        callExe.execute(new CallBack() {
-            @Override
-            public void onResponse(Response response) {
-                if (response != null) {
-                    Log.e("response", response.getBody());
-                }
-            }
+                            handler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    iv.setImageBitmap(bitmap);
+                                }
+                            });
+                        }
+                    }
 
-            @Override
-            public void onFailure(Exception e) {
-                Log.e("response", e.getMessage());
-            }
-        });
+                    @Override
+                    public void onFailure(Exception e) {
+                        Log.e("response", e.getMessage());
+                    }
+                });
     }
 
     public void httpDownload() {
-        Request request = new Request.Builder()
-                .url("http://f3.market.xiaomi.com/download/AppStore/0b3f6b4e06ff14b61065972a96149da822c86ad40/com.eg.android.AlipayGphone.apk")
-                .method("GET")
-                .build();
-        callDownload = client.newCall(request);
+        callDownload = client.newCall("http://f3.market.xiaomi.com/download/AppStore/0b3f6b4e06ff14b61065972a96149da822c86ad40/com.eg.android.AlipayGphone.apk");
         callDownload.execute(new CallBack() {
             @Override
             public void onResponse(Response response) {
