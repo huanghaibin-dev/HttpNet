@@ -32,7 +32,7 @@ public class FormContent extends HttpContent {
 
     @Override
     public void doOutput() throws IOException {
-        if(mParams != null && mParams.getTextParams() != null){
+        if (mParams != null && mParams.getTextParams() != null && mParams.getTextParams().size() > 0) {
             StringBuffer buffer = new StringBuffer();
             intoString(buffer);
             mOutputStream.write(buffer.substring(0, buffer.length() - 1).getBytes(mEncode));

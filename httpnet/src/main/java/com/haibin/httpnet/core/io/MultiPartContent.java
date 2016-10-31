@@ -39,8 +39,10 @@ public class MultiPartContent extends HttpContent {
 
     @Override
     public void doOutput() throws IOException {
-        outputText();
-        outputFileFormData();
+        if (mParams.getTextParams() != null && mParams.getTextParams().size() > 0)
+            outputText();
+        if (mParams.getMultiParams() != null && mParams.getMultiParams().size() > 0)
+            outputFileFormData();
         outputEnd();
     }
 
