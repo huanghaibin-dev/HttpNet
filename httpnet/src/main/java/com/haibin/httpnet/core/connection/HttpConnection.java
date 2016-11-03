@@ -28,6 +28,10 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URLConnection;
 
+/**
+ * http连接
+ */
+@SuppressWarnings("unused")
 public class HttpConnection extends Connection {
     private HttpURLConnection mHttpUrlConnection;
     private InterceptListener mListener;

@@ -36,7 +36,7 @@ import javax.net.ssl.TrustManagerFactory;
 /**
  * using https ssl 证书管理工具
  */
-
+@SuppressWarnings("unused")
 public final class SSLManager {
 
     private static SSLSocketFactory mDefaultSslSocketFactory;
@@ -139,11 +139,11 @@ public final class SSLManager {
      * @param cerValues cerValues
      */
     public void setSslSocketFactoryAsString(String... cerValues) {
-        ByteArrayInputStream[] cers = new ByteArrayInputStream[cerValues.length];
+        ByteArrayInputStream[] cer = new ByteArrayInputStream[cerValues.length];
         for (int i = 0; i < cerValues.length; i++) {
-            cers[i] = new ByteArrayInputStream(cerValues[i].getBytes());
+            cer[i] = new ByteArrayInputStream(cerValues[i].getBytes());
         }
-        setSslSocketFactory(cers);
+        setSslSocketFactory(cer);
     }
 
     public SSLSocketFactory getSslSocketFactory() {

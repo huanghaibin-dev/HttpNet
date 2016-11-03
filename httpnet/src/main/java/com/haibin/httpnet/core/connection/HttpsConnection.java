@@ -28,6 +28,10 @@ import java.net.URLConnection;
 
 import javax.net.ssl.HttpsURLConnection;
 
+/**
+ * https连接
+ */
+@SuppressWarnings("unused")
 public class HttpsConnection extends Connection {
     private HttpsURLConnection mHttpsUrlConnection;
     private InterceptListener mListener;
