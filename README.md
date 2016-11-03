@@ -8,7 +8,7 @@ HttpNet网络请求框架基于HttpUrlConnection，采用Client + Request + Call
 ##gradle
 
 ```java
-compile 'com.haibin:httpnet:1.0.9'
+compile 'com.haibin:httpnet:1.1.0'
 ```
 
 ###默认支持Https认证，如果使用数字证书,在执行请求之前使用下面3种API导入证书即可
@@ -82,18 +82,27 @@ HttpNetClient client = new HttpNetClient();
 
 client.setProxy("192.168.1.1",80);//您也可以开启该客户端全局代理
 
-client.newCall(request).execute(new CallBack() {
-            @Override
-            public void onResponse(Response response) {
-                String body = response.getBody();
-                InputStream is = response.toStream();//如果采用下载，可以在这里监听下载进度
-            }
+client.newCall(request)
+                //如果采用上传文件方式，可以在这里开启上传进度监控
+                .intercept(new InterceptListener() {
+                    @Override
+                    public void onProgress(final int index, final long currentLength, final long totalLength) {
+                        Log.e("当前进度", "  --  " + ((float) currentLength / totalLength) * 100);
+                    }
+                })
+                .execute(new CallBack() {
+                    @Override
+                    public void onResponse(Response response) {
+                        String body = response.getBody();
+                        InputStream is = response.toStream();//如果采用下载，可以在这里监听下载进度
+                    }
 
-            @Override
-            public void onFailure(Exception e) {
+                    @Override
+                    public void onFailure(Exception e) {
+                        Log.e("onFailure", " onFailure " + e.getMessage());
+                    }
+                });
 
-            }
-        });
 ```
 
 ##Licenses
