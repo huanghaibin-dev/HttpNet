@@ -18,6 +18,7 @@ package com.haibin.httpnet.core;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.haibin.httpnet.core.io.IO;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -32,19 +33,21 @@ public class ContentTypeFactory {
 
     private ContentTypeFactory() {
         InputStream is = getClass().getResourceAsStream("/assets/content_type.json");
+        ByteArrayOutputStream bos = null;
         try {
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            bos = new ByteArrayOutputStream();
             int ch;
             while ((ch = is.read()) != -1) {
                 bos.write(ch);
             }
             byte data[] = bos.toByteArray();
-            bos.close();
             String json = new String(data);
             mTypeMap = new Gson().fromJson(json, new TypeToken<Map<String, String>>() {
             }.getType());
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            IO.close(bos, is);
         }
     }
 
