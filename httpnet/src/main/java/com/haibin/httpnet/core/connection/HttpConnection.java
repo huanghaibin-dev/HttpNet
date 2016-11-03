@@ -19,6 +19,7 @@ package com.haibin.httpnet.core.connection;
 import com.haibin.httpnet.HttpNetClient;
 import com.haibin.httpnet.core.Response;
 import com.haibin.httpnet.core.call.CallBack;
+import com.haibin.httpnet.core.call.InterceptListener;
 import com.haibin.httpnet.core.io.HttpContent;
 import com.haibin.httpnet.core.io.IO;
 
@@ -29,9 +30,15 @@ import java.net.URLConnection;
 
 public class HttpConnection extends Connection {
     private HttpURLConnection mHttpUrlConnection;
+    private InterceptListener mListener;
 
     public HttpConnection(HttpNetClient client) {
         super(client);
+    }
+
+    public HttpConnection(HttpNetClient client, InterceptListener listener) {
+        super(client);
+        this.mListener = listener;
     }
 
     @Override
@@ -40,6 +47,7 @@ public class HttpConnection extends Connection {
         mHttpUrlConnection.setRequestMethod(method);
         mHttpUrlConnection.setUseCaches(true);
         mHttpUrlConnection.setConnectTimeout(mRequest.timeout());
+        mHttpUrlConnection.setChunkedStreamingMode(1024);
         mHttpUrlConnection.setRequestProperty("Accept-Language", "zh-CN");
         mHttpUrlConnection.setRequestProperty("Charset", mRequest.encode());
         mHttpUrlConnection.setRequestProperty("Connection", "Keep-Alive");
@@ -53,6 +61,7 @@ public class HttpConnection extends Connection {
         HttpContent body = mRequest.content();
         if (body != null) {
             body.setOutputStream(mOutputStream);
+            body.doOutput(mListener);
         }
     }
 

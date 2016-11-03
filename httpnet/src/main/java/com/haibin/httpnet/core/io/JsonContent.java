@@ -15,6 +15,8 @@
  */
 package com.haibin.httpnet.core.io;
 
+import com.haibin.httpnet.core.call.InterceptListener;
+
 import java.io.IOException;
 
 /**
@@ -48,6 +50,11 @@ public class JsonContent extends HttpContent {
             mOutputStream.write(mJson.getBytes(mEncode));
         }
         //outputEnd();
+    }
+
+    @Override
+    public void doOutput(InterceptListener listener) throws IOException {
+        doOutput();
     }
 
     @Override

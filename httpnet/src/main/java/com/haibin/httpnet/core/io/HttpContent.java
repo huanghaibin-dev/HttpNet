@@ -16,22 +16,17 @@
 package com.haibin.httpnet.core.io;
 
 import com.haibin.httpnet.builder.RequestParams;
+import com.haibin.httpnet.core.call.InterceptListener;
 
 import java.io.DataOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
 
 /**
- *
- *                                            ***** FormContent
+ * ***** FormContent
  * 定义HttpContent 传输数据，使用策略模式 ********* JsonContent
- *                                            ***** MultiPartContent
- *
+ * ***** MultiPartContent
  */
 public abstract class HttpContent {
     public static final String BOUNDARY = "http-net";
@@ -48,7 +43,6 @@ public abstract class HttpContent {
 
     public void setOutputStream(DataOutputStream outputStream) throws IOException {
         this.mOutputStream = outputStream;
-        doOutput();
     }
 
     public HttpContent(RequestParams params) {
@@ -73,6 +67,8 @@ public abstract class HttpContent {
     }
 
     public abstract void doOutput() throws IOException;
+
+    public abstract void doOutput(InterceptListener listener) throws IOException;
 
     public abstract String intoString();
 

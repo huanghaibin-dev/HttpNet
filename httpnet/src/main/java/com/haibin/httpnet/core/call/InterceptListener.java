@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.haibin.httpnet.core;
+package com.haibin.httpnet.core.call;
 
 /**
  * 上传文件进度监听
  */
 
-public interface ProgressListener {
-    void onProgress(long currentLength, long allLength);
+public interface InterceptListener {
+    void onProgress(int index, long currentLength, long totalLength);
 }

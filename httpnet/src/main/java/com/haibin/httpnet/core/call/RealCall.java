@@ -25,6 +25,7 @@ public class RealCall implements Call {
     private HttpNetClient mClient;
     private Request mRequest;
     private AsyncCall mAsyncCall;
+    private InterceptListener mListener;
 
     public RealCall(HttpNetClient client, Request request) {
         this.mClient = client;
@@ -32,9 +33,15 @@ public class RealCall implements Call {
     }
 
     @Override
+    public Call intercept(InterceptListener listener) {
+        this.mListener = listener;
+        return this;
+    }
+
+    @Override
     public void execute(CallBack callBack) {
         if (mAsyncCall == null)
-            mAsyncCall = new AsyncCall(mClient, mRequest, callBack);
+            mAsyncCall = new AsyncCall(mClient, mRequest, callBack, mListener);
         mClient.dispatcher().enqueue(mAsyncCall);
     }
 

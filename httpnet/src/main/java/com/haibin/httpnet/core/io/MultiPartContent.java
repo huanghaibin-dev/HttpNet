@@ -17,7 +17,7 @@ package com.haibin.httpnet.core.io;
 
 import com.haibin.httpnet.builder.RequestParams;
 import com.haibin.httpnet.core.ContentTypeFactory;
-import com.haibin.httpnet.core.ProgressListener;
+import com.haibin.httpnet.core.call.InterceptListener;
 
 import java.io.DataInputStream;
 import java.io.File;
@@ -31,10 +31,19 @@ import java.util.Set;
  * HTTP MultiPart RequestBody，请全体包括文本、文件流等
  */
 public class MultiPartContent extends HttpContent {
-    private ProgressListener mListener = null;
+    private InterceptListener mListener = null;
 
     public MultiPartContent(RequestParams params, String encode) {
         super(params, encode);
+    }
+
+    public MultiPartContent(RequestParams params, String encode, InterceptListener listener) {
+        super(params, encode);
+        this.mListener = listener;
+    }
+
+    public MultiPartContent(RequestParams params) {
+        super(params, "UTF-8");
     }
 
     @Override
@@ -46,8 +55,14 @@ public class MultiPartContent extends HttpContent {
         outputEnd();
     }
 
+    @Override
+    public void doOutput(InterceptListener listener) throws IOException {
+        this.mListener = listener;
+        doOutput();
+    }
+
     private void outputText() throws IOException {
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder buffer = new StringBuilder();
         Set<String> set = mParams.getTextParams().keySet();
         Map<String, String> texts = mParams.getTextParams();
         for (Iterator<String> iterator = set.iterator(); iterator.hasNext(); ) {
@@ -64,6 +79,7 @@ public class MultiPartContent extends HttpContent {
     private void outputFileFormData() throws IOException {
         Set<String> set = mParams.getMultiParams().keySet();
         Map<String, File> fileMap = mParams.getMultiParams();
+        int index = 0;
         for (Iterator<String> iterator = set.iterator(); iterator.hasNext(); ) {
             StringBuffer buffer = new StringBuffer();
             String key = iterator.next();
@@ -75,28 +91,29 @@ public class MultiPartContent extends HttpContent {
             buffer.append("Content-Type: " + ContentTypeFactory.getInstance().getContentType(fileName));
             buffer.append(END + END);
             mOutputStream.writeBytes(buffer.toString());
-            outputFile(file);
+            outputFile(file, index);
+            ++index;
         }
     }
 
-    private void outputFile(File file) throws IOException {
+    private void outputFile(File file, int index) throws IOException {
         DataInputStream in = new DataInputStream(new FileInputStream(file));
         long p = 0;
         long length = file.length();
-        int bytes = 0;
-        onProgress(mListener, p, length);
+        int bytes;
+        onProgress(index, mListener, p, length);
         byte[] bufferOut = new byte[1024 * 10];
         while ((bytes = in.read(bufferOut)) != -1) {
             mOutputStream.write(bufferOut, 0, bytes);
             p += bytes;
-            onProgress(mListener, p, length);
+            onProgress(index, mListener, p, length);
         }
         in.close();
     }
 
-    private void onProgress(ProgressListener listener, long currentLength, long allLength) {
+    private void onProgress(int index, InterceptListener listener, long currentLength, long allLength) {
         if (listener != null)
-            listener.onProgress(currentLength, allLength);
+            listener.onProgress(index, currentLength, allLength);
     }
 
     private void intoString(StringBuffer buffer) {

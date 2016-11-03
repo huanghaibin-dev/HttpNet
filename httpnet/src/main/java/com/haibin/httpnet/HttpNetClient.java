@@ -59,19 +59,31 @@ public final class HttpNetClient {
         return mProxy;
     }
 
+    /**
+     * 开启全局代理
+     */
     public void setProxy(Proxy proxy) {
         this.mProxy = proxy;
     }
 
+    /**
+     * 开启全局代理
+     */
     public void setProxy(String host, int port) {
         this.mProxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(host, port));
     }
 
+    /**
+     * 导入证书
+     */
     public HttpNetClient setSslSocketFactory(SSLSocketFactory sslSocketFactory) {
         mSslManager.setSslSocketFactory(sslSocketFactory);
         return this;
     }
 
+    /**
+     * 导入证书
+     */
     public HttpNetClient setSslSocketFactory(InputStream... cerInputStream) {
         mSslManager.setSslSocketFactory(cerInputStream);
         return this;
@@ -91,7 +103,7 @@ public final class HttpNetClient {
         return mSslManager.getSslSocketFactory();
     }
 
-    Request getDefaultRequest(String url) {
+    private Request getDefaultRequest(String url) {
         return new Request.Builder()
                 .url(url)
                 .build();

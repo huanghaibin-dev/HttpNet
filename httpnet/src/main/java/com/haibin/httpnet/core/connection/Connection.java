@@ -29,7 +29,6 @@ import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -37,7 +36,6 @@ import java.util.Set;
 /**
  * 链接对象，使用策略模式
  */
-@SuppressWarnings("unused")
 public abstract class Connection {
     HttpNetClient mClient;
     Request mRequest;
@@ -86,6 +84,7 @@ public abstract class Connection {
             }
             mInputStream = mUrlConnection.getInputStream();
             onResponse(callBack);
+            callBack = null;
         } catch (IOException e) {
             e.printStackTrace();
             callBack.onFailure(e);
@@ -122,8 +121,7 @@ public abstract class Connection {
             Map<String, List<String>> maps = headers.getHeaders();
             if (maps != null) {
                 Set<String> sets = maps.keySet();
-                for (Iterator<String> iterator = sets.iterator(); iterator.hasNext(); ) {
-                    String key = iterator.next();
+                for (String key : sets) {
                     for (String value : maps.get(key)) {
                         mUrlConnection.addRequestProperty(key, value);
                     }

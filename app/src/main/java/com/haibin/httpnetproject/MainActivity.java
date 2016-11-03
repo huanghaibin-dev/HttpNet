@@ -12,13 +12,16 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.haibin.httpnet.HttpNetClient;
 import com.haibin.httpnet.builder.Headers;
 import com.haibin.httpnet.builder.Request;
+import com.haibin.httpnet.builder.RequestParams;
 import com.haibin.httpnet.core.Response;
 import com.haibin.httpnet.core.call.Call;
 import com.haibin.httpnet.core.call.CallBack;
+import com.haibin.httpnet.core.call.InterceptListener;
 import com.haibin.httpnet.core.io.JsonContent;
 
 import java.io.File;
@@ -54,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_execute:
-                httpPostJson();
+                upload();
                 break;
             case R.id.btn_cancel:
                 if (callExe != null) {
@@ -93,6 +96,46 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onFailure(Exception e) {
                         Log.e("onFailure", e.getMessage());
+                    }
+                });
+    }
+
+    public void upload() {
+        Request request = new Request.Builder()
+                .url("http://upload.cnblogs.com/ImageUploader/TemporaryAvatarUpload")
+                .method("POST")
+                .params(new RequestParams()
+                        .putFile("qqfile", "/storage/emulated/0/DCIM/Camera/IMG_20160909_080844.jpg"))
+                .headers(new Headers.Builder().addHeader("Cookie", "pgv_pvi=9544373248; .CNBlogsCookie=CA5152A644BF0710FB4CFFE2D1634FEE921CB1201E01962ACCEAEE2417BC6AE649E30F5C6DD63FC40ED6B064E4709B1656F8273AE2050DE1FAC47CE884FDFE6D430BAA80271DF15ADAD159FCDF0F37C7AC3B987FFA9ED210939E0650C08D42F84C0FC029; _ga=GA1.2.2128538109.1473746167; _gat=1"))
+                .build();
+        client.newCall(request)
+                .intercept(new InterceptListener() {
+                    @Override
+                    public void onProgress(final int index, final long currentLength, final long totalLength) {
+                        Log.e("当前进度", "  --  " + ((float) currentLength / totalLength) * 100);
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                text.setText("第 " + (index + 1) + " 个文件上传进度" + ((float) currentLength / totalLength) * 100);
+                            }
+                        });
+                    }
+                })
+                .execute(new CallBack() {
+                    @Override
+                    public void onResponse(Response response) {
+                        Log.e("res", response.getBody());
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(MainActivity.this, "上传完成", Toast.LENGTH_LONG).show();
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onFailure(Exception e) {
+                        Log.e("onFailure", " onFailure " + e.getMessage());
                     }
                 });
     }

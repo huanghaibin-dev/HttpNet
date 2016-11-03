@@ -19,6 +19,7 @@ package com.haibin.httpnet.core.connection;
 import com.haibin.httpnet.HttpNetClient;
 import com.haibin.httpnet.core.Response;
 import com.haibin.httpnet.core.call.CallBack;
+import com.haibin.httpnet.core.call.InterceptListener;
 import com.haibin.httpnet.core.io.HttpContent;
 
 import java.io.DataOutputStream;
@@ -29,9 +30,15 @@ import javax.net.ssl.HttpsURLConnection;
 
 public class HttpsConnection extends Connection {
     private HttpsURLConnection mHttpsUrlConnection;
+    private InterceptListener mListener;
 
     public HttpsConnection(HttpNetClient client) {
         super(client);
+    }
+
+    public HttpsConnection(HttpNetClient client, InterceptListener listener) {
+        super(client);
+        this.mListener = listener;
     }
 
     @Override
@@ -54,6 +61,7 @@ public class HttpsConnection extends Connection {
         HttpContent body = mRequest.content();
         if (body != null) {
             body.setOutputStream(mOutputStream);
+            body.doOutput(mListener);
         }
     }
 

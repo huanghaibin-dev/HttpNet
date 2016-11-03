@@ -16,6 +16,7 @@
 package com.haibin.httpnet.core.io;
 
 import com.haibin.httpnet.builder.RequestParams;
+import com.haibin.httpnet.core.call.InterceptListener;
 
 import java.io.IOException;
 import java.util.Iterator;
@@ -37,6 +38,11 @@ public class FormContent extends HttpContent {
             intoString(buffer);
             mOutputStream.write(buffer.substring(0, buffer.length() - 1).getBytes(mEncode));
         }
+    }
+
+    @Override
+    public void doOutput(InterceptListener listener) throws IOException {
+        doOutput();
     }
 
     private void intoString(StringBuffer buffer) {

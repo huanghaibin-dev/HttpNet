@@ -36,33 +36,23 @@ public class AsyncCall implements Runnable {
         mConnection = request.url().startsWith("https") ? new HttpsConnection(client) : new HttpConnection(client);
     }
 
+    public AsyncCall(HttpNetClient client, Request request, CallBack callBack, InterceptListener listener) {
+        this.mCallBack = callBack;
+        this.mRequest = request;
+        mConnection = request.url().startsWith("https") ? new HttpsConnection(client, listener) : new HttpConnection(client, listener);
+    }
+
     @Override
     public void run() {
         mConnection.connect(mRequest, mCallBack);
-    }
-
-    public CallBack getCallBack() {
-        return mCallBack;
-    }
-
-    public void setCallBack(CallBack mCallBack) {
-        this.mCallBack = mCallBack;
     }
 
     public Request getRequest() {
         return mRequest;
     }
 
-    public void setRequest(Request mRequest) {
-        this.mRequest = mRequest;
-    }
-
     public Connection getConnection() {
         return mConnection;
-    }
-
-    public void setConnection(Connection mConnection) {
-        this.mConnection = mConnection;
     }
 
     @Override
