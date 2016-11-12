@@ -8,7 +8,7 @@ HttpNet网络请求框架基于HttpUrlConnection，采用Client + Request + Call
 ##gradle
 
 ```java
-compile 'com.haibin:httpnet:1.1.0'
+compile 'com.haibin:httpnet:1.1.1'
 ```
 
 ###默认支持Https认证，如果使用数字证书,在执行请求之前使用下面3种API导入证书即可
