@@ -49,8 +49,8 @@ public class FormContent extends HttpContent {
         Set<String> set = mParams.getTextParams().keySet();
         Map<String, String> texts = mParams.getTextParams();
         for (Iterator<String> iterator = set.iterator(); iterator.hasNext(); ) {
-            String key = iterator.next();
-            String value = texts.get(key);
+            String key = urlEncode(iterator.next());
+            String value = urlEncode(texts.get(key));
             buffer.append(key + "=" + value + "&");
         }
     }

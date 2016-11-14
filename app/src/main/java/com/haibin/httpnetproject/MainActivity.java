@@ -57,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_execute:
-                upload();
+                login();
                 break;
             case R.id.btn_cancel:
                 if (callExe != null) {
@@ -136,6 +136,30 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onFailure(Exception e) {
                         Log.e("onFailure", " onFailure " + e.getMessage());
+                    }
+                });
+    }
+
+    public void login(){
+        Request request = new Request.Builder()
+                .url("http://120.77.60.245:3000/mobile/login")
+                .method("POST")
+                .params(new RequestParams()
+                        .put("telephone", "13923049841")
+                        .put("password", "11431429")
+                        .put("jpushId", "dafafafafafa")
+                        .put("ip", "192.168.1.1"))
+                .build();
+        client.newCall(request)
+                .execute(new CallBack() {
+                    @Override
+                    public void onResponse(Response response) {
+                        Log.e("当前进度", "  --  " + response.getBody());
+                    }
+
+                    @Override
+                    public void onFailure(Exception e) {
+
                     }
                 });
     }

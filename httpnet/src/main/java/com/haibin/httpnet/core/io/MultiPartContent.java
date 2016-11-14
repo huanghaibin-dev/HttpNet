@@ -66,8 +66,8 @@ public class MultiPartContent extends HttpContent {
         Set<String> set = mParams.getTextParams().keySet();
         Map<String, String> texts = mParams.getTextParams();
         for (Iterator<String> iterator = set.iterator(); iterator.hasNext(); ) {
-            String key = iterator.next();
-            String value = texts.get(key);
+            String key = urlEncode(iterator.next());
+            String value = urlEncode(texts.get(key));
             buffer.append(END + DATA_TAG + BOUNDARY + END);
             buffer.append("Content-Disposition: form-data; name=\"" + key + "\"");
             buffer.append(END + END);
@@ -82,7 +82,7 @@ public class MultiPartContent extends HttpContent {
         int index = 0;
         for (Iterator<String> iterator = set.iterator(); iterator.hasNext(); ) {
             StringBuffer buffer = new StringBuffer();
-            String key = iterator.next();
+            String key = urlEncode(iterator.next());
             File file = fileMap.get(key);
             String fileName = file.getName();
             buffer.append(END + DATA_TAG + BOUNDARY + END);
