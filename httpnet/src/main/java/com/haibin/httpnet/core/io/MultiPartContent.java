@@ -65,8 +65,8 @@ public class MultiPartContent extends HttpContent {
         StringBuilder buffer = new StringBuilder();
         Set<String> set = mParams.getTextParams().keySet();
         Map<String, String> texts = mParams.getTextParams();
-        for (Iterator<String> iterator = set.iterator(); iterator.hasNext(); ) {
-            String key = urlEncode(iterator.next());
+        for (String aSet : set) {
+            String key = urlEncode(aSet);
             String value = urlEncode(texts.get(key));
             buffer.append(END + DATA_TAG + BOUNDARY + END);
             buffer.append("Content-Disposition: form-data; name=\"" + key + "\"");
@@ -80,9 +80,9 @@ public class MultiPartContent extends HttpContent {
         Set<String> set = mParams.getMultiParams().keySet();
         Map<String, File> fileMap = mParams.getMultiParams();
         int index = 0;
-        for (Iterator<String> iterator = set.iterator(); iterator.hasNext(); ) {
+        for (String aSet : set) {
             StringBuffer buffer = new StringBuffer();
-            String key = urlEncode(iterator.next());
+            String key = urlEncode(aSet);
             File file = fileMap.get(key);
             String fileName = file.getName();
             buffer.append(END + DATA_TAG + BOUNDARY + END);
@@ -119,8 +119,7 @@ public class MultiPartContent extends HttpContent {
     private void intoString(StringBuffer buffer) {
         Set<String> set = mParams.getTextParams().keySet();
         Map<String, String> texts = mParams.getTextParams();
-        for (Iterator<String> iterator = set.iterator(); iterator.hasNext(); ) {
-            String key = iterator.next();
+        for (String key : set) {
             String value = texts.get(key);
             buffer.append(key + "=" + value + "&");
         }
@@ -140,8 +139,8 @@ public class MultiPartContent extends HttpContent {
         Map<String, File> multi = mParams.getMultiParams();
         if (text != null) {
             Set<String> set = text.keySet();
-            for (Iterator<String> iterator = set.iterator(); iterator.hasNext(); ) {
-                length += (END + DATA_TAG + BOUNDARY + END + "Content-Disposition: form-data; name=\"" + iterator.next() + "\"" + END + END).length();
+            for (String aSet : set) {
+                length += (END + DATA_TAG + BOUNDARY + END + "Content-Disposition: form-data; name=\"" + aSet + "\"" + END + END).length();
             }
         }
         if (multi != null) {

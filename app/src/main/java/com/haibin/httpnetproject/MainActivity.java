@@ -57,7 +57,8 @@ public class MainActivity extends AppCompatActivity {
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_execute:
-                login();
+                //login();
+                httpPostJson();
                 break;
             case R.id.btn_cancel:
                 if (callExe != null) {

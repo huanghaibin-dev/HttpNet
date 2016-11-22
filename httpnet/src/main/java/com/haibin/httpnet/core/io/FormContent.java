@@ -48,8 +48,8 @@ public class FormContent extends HttpContent {
     private void intoString(StringBuffer buffer) {
         Set<String> set = mParams.getTextParams().keySet();
         Map<String, String> texts = mParams.getTextParams();
-        for (Iterator<String> iterator = set.iterator(); iterator.hasNext(); ) {
-            String key = urlEncode(iterator.next());
+        for (String aSet : set) {
+            String key = urlEncode(aSet);
             String value = urlEncode(texts.get(key));
             buffer.append(key + "=" + value + "&");
         }

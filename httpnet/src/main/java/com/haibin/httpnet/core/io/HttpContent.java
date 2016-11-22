@@ -29,14 +29,14 @@ import java.net.URLEncoder;
  * ***** MultiPartContent
  */
 public abstract class HttpContent {
-    public static final String BOUNDARY = "http-net";
-    public static final String DATA_TAG = "--";
-    public static final String END = "\r\n";
-    protected String mEncode;
-    protected RequestParams mParams;
-    protected DataOutputStream mOutputStream;
+     public static final String BOUNDARY = "http-net";
+     static final String DATA_TAG = "--";
+     static final String END = "\r\n";
+     String mEncode;
+     RequestParams mParams;
+     DataOutputStream mOutputStream;
 
-    public HttpContent(RequestParams mParams, String encode) {
+     HttpContent(RequestParams mParams, String encode) {
         this.mEncode = encode == null ? "UTF-8" : encode;
         this.mParams = mParams;
     }
@@ -45,19 +45,7 @@ public abstract class HttpContent {
         this.mOutputStream = outputStream;
     }
 
-    public HttpContent(RequestParams params) {
-        this.mParams = params;
-    }
-
-    public RequestParams getParams() {
-        return mParams;
-    }
-
-    public void setParams(RequestParams mParams) {
-        this.mParams = mParams;
-    }
-
-    protected String urlEncode(String value) {
+    String urlEncode(String value) {
         try {
             return URLEncoder.encode(value, mEncode);
         } catch (UnsupportedEncodingException e) {
@@ -72,7 +60,7 @@ public abstract class HttpContent {
 
     public abstract String intoString();
 
-    public void outputEnd() throws IOException {
+    void outputEnd() throws IOException {
         mOutputStream.writeBytes(END + DATA_TAG + BOUNDARY + DATA_TAG + END);
         mOutputStream.flush();
         mOutputStream.close();
