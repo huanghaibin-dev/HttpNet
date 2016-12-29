@@ -16,22 +16,23 @@
 package com.haibin.httpnet.builder;
 
 import java.io.File;
-import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.Map;
 
 /**
  *
  */
+@SuppressWarnings("unused")
 public final class RequestParams {
-    private Map<String, String> textParams;
-    private Map<String, File> multiParams;
+    private IdentityHashMap<Key, String> textParams;
+    private IdentityHashMap<Key, File> multiParams;
 
     public RequestParams() {
-        textParams = new HashMap<>();
+        textParams = new IdentityHashMap<>();
     }
 
     public RequestParams put(String name, String value) {
-        textParams.put(name, value);
+        textParams.put(new Key(name), value);
         return this;
     }
 
@@ -60,10 +61,10 @@ public final class RequestParams {
     }
 
     public RequestParams putFile(String name, File file) {
-        if (multiParams == null) multiParams = new HashMap<>();
+        if (multiParams == null) multiParams = new IdentityHashMap<>();
         if (!file.exists())
             return this;//throw new IllegalArgumentException("request param file not find exception");
-        multiParams.put(name, file);
+        multiParams.put(new Key(name), file);
         return this;
     }
 
@@ -71,11 +72,27 @@ public final class RequestParams {
         return putFile(name, new File(fileName));
     }
 
-    public Map<String, String> getTextParams() {
+    public IdentityHashMap<Key, String> getTextParams() {
         return textParams;
     }
 
-    public Map<String, File> getMultiParams() {
+    public IdentityHashMap<Key, File> getMultiParams() {
         return multiParams;
+    }
+
+    public class Key {
+        private String name;
+
+        public Key(String name) {
+            this.name = name;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
     }
 }

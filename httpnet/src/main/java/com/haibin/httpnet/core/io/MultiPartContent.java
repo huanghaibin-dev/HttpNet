@@ -23,13 +23,14 @@ import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.IdentityHashMap;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Set;
 
 /**
  * HTTP MultiPart RequestBody，请全体包括文本、文件流等
  */
+@SuppressWarnings("all")
 public class MultiPartContent extends HttpContent {
     private InterceptListener mListener = null;
 
@@ -63,10 +64,10 @@ public class MultiPartContent extends HttpContent {
 
     private void outputText() throws IOException {
         StringBuilder buffer = new StringBuilder();
-        Set<String> set = mParams.getTextParams().keySet();
-        Map<String, String> texts = mParams.getTextParams();
-        for (String aSet : set) {
-            String key = urlEncode(aSet);
+        Set<RequestParams.Key> set = mParams.getTextParams().keySet();
+        IdentityHashMap<RequestParams.Key, String> texts = mParams.getTextParams();
+        for (RequestParams.Key keys : set) {
+            String key = urlEncode(keys.getName());
             String value = urlEncode(texts.get(key));
             buffer.append(END + DATA_TAG + BOUNDARY + END);
             buffer.append("Content-Disposition: form-data; name=\"" + key + "\"");
@@ -77,13 +78,13 @@ public class MultiPartContent extends HttpContent {
     }
 
     private void outputFileFormData() throws IOException {
-        Set<String> set = mParams.getMultiParams().keySet();
-        Map<String, File> fileMap = mParams.getMultiParams();
+        Set<RequestParams.Key> set = mParams.getMultiParams().keySet();
+        IdentityHashMap<RequestParams.Key, File> fileMap = mParams.getMultiParams();
         int index = 0;
-        for (String aSet : set) {
+        for (RequestParams.Key keys : set) {
             StringBuffer buffer = new StringBuffer();
-            String key = urlEncode(aSet);
-            File file = fileMap.get(key);
+            String key = urlEncode(keys.getName());
+            File file = fileMap.get(keys);
             String fileName = file.getName();
             buffer.append(END + DATA_TAG + BOUNDARY + END);
             buffer.append("Content-Disposition: form-data; name=\"" + key + "\"; filename=\"" + fileName + "\"");
@@ -117,11 +118,11 @@ public class MultiPartContent extends HttpContent {
     }
 
     private void intoString(StringBuffer buffer) {
-        Set<String> set = mParams.getTextParams().keySet();
-        Map<String, String> texts = mParams.getTextParams();
-        for (String key : set) {
-            String value = texts.get(key);
-            buffer.append(key + "=" + value + "&");
+        Set<RequestParams.Key> set = mParams.getTextParams().keySet();
+        IdentityHashMap<RequestParams.Key, String> texts = mParams.getTextParams();
+        for (RequestParams.Key keys : set) {
+            String value = texts.get(keys.getName());
+            buffer.append(keys.getName() + "=" + value + "&");
         }
     }
 
@@ -135,18 +136,18 @@ public class MultiPartContent extends HttpContent {
     @Override
     public long getContentLength() {
         long length = 0;
-        Map<String, String> text = mParams.getTextParams();
-        Map<String, File> multi = mParams.getMultiParams();
+        IdentityHashMap<RequestParams.Key, String> text = mParams.getTextParams();
+        IdentityHashMap<RequestParams.Key, File> multi = mParams.getMultiParams();
         if (text != null) {
-            Set<String> set = text.keySet();
-            for (String aSet : set) {
-                length += (END + DATA_TAG + BOUNDARY + END + "Content-Disposition: form-data; name=\"" + aSet + "\"" + END + END).length();
+            Set<RequestParams.Key> set = text.keySet();
+            for (RequestParams.Key keys : set) {
+                length += (END + DATA_TAG + BOUNDARY + END + "Content-Disposition: form-data; name=\"" + keys.getName() + "\"" + END + END).length();
             }
         }
         if (multi != null) {
-            Set<String> set = multi.keySet();
-            for (Iterator<String> iterator = set.iterator(); iterator.hasNext(); ) {
-                String key = iterator.next();
+            Set<RequestParams.Key> set = multi.keySet();
+            for (Iterator<RequestParams.Key> iterator = set.iterator(); iterator.hasNext(); ) {
+                String key = iterator.next().getName();
                 File file = multi.get(key);
                 String fileName = file.getName();
                 length += ("Content-Disposition: form-data; name=\"" + key + "\"; filename=\"" + fileName + "\""

@@ -15,6 +15,10 @@
  */
 package com.haibin.httpnet.core.call;
 
+import com.haibin.httpnet.core.Response;
+
+import java.io.IOException;
+
 /**
  * 执行Request
  */
@@ -22,7 +26,9 @@ public interface Call {
 
     Call intercept(InterceptListener listener);
 
-    void execute(CallBack callBack);//执行一个请求
+    void execute(Callback callBack);//执行一个请求
+
+    Response execute() throws IOException;
 
     void cancel();//取消一个http请求
 }

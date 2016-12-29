@@ -17,20 +17,23 @@ package com.haibin.httpnet.core.call;
 
 import com.haibin.httpnet.HttpNetClient;
 import com.haibin.httpnet.builder.Request;
+import com.haibin.httpnet.core.Response;
 import com.haibin.httpnet.core.connection.Connection;
 import com.haibin.httpnet.core.connection.HttpConnection;
 import com.haibin.httpnet.core.connection.HttpsConnection;
+
+import java.io.IOException;
 
 /**
  *
  */
 
 public class AsyncCall implements Runnable {
-    private CallBack mCallBack;
+    private Callback mCallBack;
     private Request mRequest;
     private Connection mConnection;
 
-    AsyncCall(HttpNetClient client, Request request, CallBack callBack, InterceptListener listener) {
+    AsyncCall(HttpNetClient client, Request request, Callback callBack, InterceptListener listener) {
         this.mCallBack = callBack;
         this.mRequest = request;
         mConnection = request.url().startsWith("https") ? new HttpsConnection(client, listener) : new HttpConnection(client, listener);
@@ -39,6 +42,10 @@ public class AsyncCall implements Runnable {
     @Override
     public void run() {
         mConnection.connect(mRequest, mCallBack);
+    }
+
+    public Response execute() throws IOException {
+        return mConnection.connect(mRequest);
     }
 
     public Request getRequest() {

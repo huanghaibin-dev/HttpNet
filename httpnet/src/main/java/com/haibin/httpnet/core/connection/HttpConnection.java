@@ -18,7 +18,7 @@ package com.haibin.httpnet.core.connection;
 
 import com.haibin.httpnet.HttpNetClient;
 import com.haibin.httpnet.core.Response;
-import com.haibin.httpnet.core.call.CallBack;
+import com.haibin.httpnet.core.call.Callback;
 import com.haibin.httpnet.core.call.InterceptListener;
 import com.haibin.httpnet.core.io.HttpContent;
 import com.haibin.httpnet.core.io.IO;
@@ -90,12 +90,20 @@ public class HttpConnection extends Connection {
     }
 
     @Override
-    void onResponse(CallBack callBack) throws IOException {
+    void onResponse(Callback callBack) throws IOException {
         callBack.onResponse(
                 new Response(mHttpUrlConnection.getResponseCode(),
                         mInputStream,
                         mHttpUrlConnection.getHeaderFields(),
                         mRequest.encode(), mHttpUrlConnection.getContentLength()));
+    }
+
+    @Override
+    Response getResponse() throws IOException {
+        return new Response(mHttpUrlConnection.getResponseCode(),
+                mInputStream,
+                mHttpUrlConnection.getHeaderFields(),
+                mRequest.encode(), mHttpUrlConnection.getContentLength());
     }
 
     @Override

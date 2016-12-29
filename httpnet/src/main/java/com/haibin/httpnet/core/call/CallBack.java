@@ -21,7 +21,7 @@ import com.haibin.httpnet.core.Response;
  * request callback
  */
 
-public interface CallBack {
+public interface Callback {
     void onResponse(Response response);
 
     void onFailure(Exception e);

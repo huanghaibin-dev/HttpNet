@@ -30,10 +30,10 @@ public final class Dispatcher {
     private ExecutorService mExecutorService;
 
     public Dispatcher() {
-        this.mExecutorService = new ThreadPoolExecutor(3, Integer.MAX_VALUE, 60, TimeUnit.SECONDS, new SynchronousQueue<Runnable>());
+        this.mExecutorService = new ThreadPoolExecutor(3, Integer.MAX_VALUE, 60L, TimeUnit.SECONDS, new SynchronousQueue<Runnable>());
     }
 
-    public void enqueue(AsyncCall call) {
+    public void execute(AsyncCall call) {
         this.mExecutorService.execute(call);
     }
 }

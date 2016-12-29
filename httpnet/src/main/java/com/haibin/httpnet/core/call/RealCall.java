@@ -17,6 +17,9 @@ package com.haibin.httpnet.core.call;
 
 import com.haibin.httpnet.HttpNetClient;
 import com.haibin.httpnet.builder.Request;
+import com.haibin.httpnet.core.Response;
+
+import java.io.IOException;
 
 /**
  *
@@ -39,10 +42,17 @@ public class RealCall implements Call {
     }
 
     @Override
-    public void execute(CallBack callBack) {
+    public Response execute() throws IOException {
+        if (mAsyncCall == null)
+            mAsyncCall = new AsyncCall(mClient, mRequest, null, mListener);
+        return mAsyncCall.execute();
+    }
+
+    @Override
+    public void execute(Callback callBack) {
         if (mAsyncCall == null)
             mAsyncCall = new AsyncCall(mClient, mRequest, callBack, mListener);
-        mClient.dispatcher().enqueue(mAsyncCall);
+        mClient.dispatcher().execute(mAsyncCall);
     }
 
     @Override

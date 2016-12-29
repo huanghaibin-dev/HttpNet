@@ -19,7 +19,8 @@ import com.haibin.httpnet.HttpNetClient;
 import com.haibin.httpnet.builder.Headers;
 import com.haibin.httpnet.builder.Request;
 import com.haibin.httpnet.builder.RequestParams;
-import com.haibin.httpnet.core.call.CallBack;
+import com.haibin.httpnet.core.Response;
+import com.haibin.httpnet.core.call.Callback;
 import com.haibin.httpnet.core.io.HttpContent;
 
 import java.io.DataOutputStream;
@@ -47,7 +48,7 @@ public abstract class Connection {
         this.mClient = client;
     }
 
-    public void connect(Request request, CallBack callBack) {
+    public void connect(Request request, Callback callBack) {
         this.mRequest = request;
 
         try {
@@ -94,6 +95,43 @@ public abstract class Connection {
 
     }
 
+    public Response connect(Request request) throws IOException {
+        this.mRequest = request;
+        String host = mRequest.host();
+        String method = mRequest.method().toUpperCase();
+        URL url = new URL(getHttpUrl(mRequest));
+
+        if (host == null && mClient.getProxy() == null) {
+            mUrlConnection = url.openConnection();
+        } else {
+            mUrlConnection = url.openConnection(host != null ? new Proxy(Proxy.Type.HTTP, new InetSocketAddress(host, mRequest.port())) : mClient.getProxy());
+        }
+
+        initHeaders();
+
+        connect(mUrlConnection, mRequest.method());
+
+        switch (method) {
+            case "GET":
+                get();
+                break;
+            case "POST":
+                post();
+                break;
+            case "DELETE":
+                delete();
+                break;
+            case "PUT":
+                put();
+                break;
+            case "PATCH":
+                patch();
+                break;
+        }
+        mInputStream = mUrlConnection.getInputStream();
+        return getResponse();
+    }
+
     abstract void connect(URLConnection connection, String method) throws IOException;
 
     abstract void post() throws IOException;
@@ -106,7 +144,9 @@ public abstract class Connection {
 
     abstract void patch() throws IOException;
 
-    abstract void onResponse(CallBack callBack) throws IOException;
+    abstract void onResponse(Callback callBack) throws IOException;
+
+    abstract Response getResponse() throws IOException;
 
     public abstract void disconnect();
 

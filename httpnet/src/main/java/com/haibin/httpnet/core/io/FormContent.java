@@ -19,8 +19,7 @@ import com.haibin.httpnet.builder.RequestParams;
 import com.haibin.httpnet.core.call.InterceptListener;
 
 import java.io.IOException;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.IdentityHashMap;
 import java.util.Set;
 
 /**
@@ -46,10 +45,10 @@ public class FormContent extends HttpContent {
     }
 
     private void intoString(StringBuffer buffer) {
-        Set<String> set = mParams.getTextParams().keySet();
-        Map<String, String> texts = mParams.getTextParams();
-        for (String aSet : set) {
-            String key = urlEncode(aSet);
+        Set<RequestParams.Key> set = mParams.getTextParams().keySet();
+        IdentityHashMap<RequestParams.Key, String> texts = mParams.getTextParams();
+        for (RequestParams.Key keys : set) {
+            String key = urlEncode(keys.getName());
             String value = urlEncode(texts.get(key));
             buffer.append(key + "=" + value + "&");
         }

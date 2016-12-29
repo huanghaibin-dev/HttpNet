@@ -20,7 +20,7 @@ import com.haibin.httpnet.builder.Request;
 import com.haibin.httpnet.builder.RequestParams;
 import com.haibin.httpnet.core.Response;
 import com.haibin.httpnet.core.call.Call;
-import com.haibin.httpnet.core.call.CallBack;
+import com.haibin.httpnet.core.call.Callback;
 import com.haibin.httpnet.core.call.InterceptListener;
 import com.haibin.httpnet.core.io.JsonContent;
 
@@ -58,7 +58,8 @@ public class MainActivity extends AppCompatActivity {
         switch (v.getId()) {
             case R.id.btn_execute:
                 //login();
-                httpPostJson();
+                //httpPostJson();
+                executeTest();
                 break;
             case R.id.btn_cancel:
                 if (callExe != null) {
@@ -72,6 +73,34 @@ public class MainActivity extends AppCompatActivity {
                 httpDownload();
                 break;
         }
+    }
+
+    public void executeTest() {
+        new Thread() {
+            @Override
+            public void run() {
+                try {
+                    Request request = new Request.Builder()
+                            .url("http://upload.cnblogs.com/ImageUploader/TemporaryAvatarUpload")
+                            .method("POST")
+                            .params(new RequestParams()
+                                    .putFile("qqfile", "/storage/emulated/0/DCIM/Camera/339718150.jpeg"))
+                            .headers(new Headers.Builder().addHeader("Cookie", "CNZZDATA1259029673=2072545293-1479795067-null%7C1479795067; lhb_smart_1=1; __utma=226521935.1789795872.1480996255.1480996255.1480996255.1; __utmz=226521935.1480996255.1.1.utmcsr=baidu|utmccn=(organic)|utmcmd=organic; .CNBlogsCookie=A6783E37E1040979421EC4A57A2FEFBB74B65BB51C7345AC99B64A7065293F59A79C6830C60D71629E8D28A332436E23CD40968EB58AA830CBD0F0733438F9A7627C074DB0462C2576D206D3752E640871E8CB23D1A50B0A9962C158466EE81425B1E516; _gat=1; _ga=GA1.2.1789795872.1480996255"))
+                            .build();
+
+                    final Response response = client.newCall(request).execute();
+                    if (response != null) {
+                        Log.e("is",response.getBody());
+//                        String body =  response.getBody();
+//                        if(body != null){
+//
+//                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }.start();
     }
 
     public void httpPostJson() {
@@ -88,7 +117,7 @@ public class MainActivity extends AppCompatActivity {
                 .headers(header)
                 .build();
         client.newCall(request)
-                .execute(new CallBack() {
+                .execute(new Callback() {
                     @Override
                     public void onResponse(Response response) {
                         Log.e("onResponse", response.getBody());
@@ -122,7 +151,7 @@ public class MainActivity extends AppCompatActivity {
                         });
                     }
                 })
-                .execute(new CallBack() {
+                .execute(new Callback() {
                     @Override
                     public void onResponse(Response response) {
                         Log.e("res", response.getBody());
@@ -141,40 +170,14 @@ public class MainActivity extends AppCompatActivity {
                 });
     }
 
-    public void login(){
-        Request request = new Request.Builder()
-                .url("http://120.77.60.245:3000/mobile/login")
-                .method("POST")
-                .params(new RequestParams()
-                        .put("telephone", "13923049841")
-                        .put("password", "11431429")
-                        .put("jpushId", "dafafafafafa")
-                        .put("ip", "192.168.1.1"))
-                .build();
-        client.newCall(request)
-                .execute(new CallBack() {
-                    @Override
-                    public void onResponse(Response response) {
-                        Log.e("当前进度", "  --  " + response.getBody());
-                    }
-
-                    @Override
-                    public void onFailure(Exception e) {
-
-                    }
-                });
-    }
-
     public void httpGet() {
         client.newCall("http://img.pconline.com.cn/images/upload/upc/tx/wallpaper/1306/27/c4/22626360_1372304637240_800x800.jpg")
-                .execute(new CallBack() {
+                .execute(new Callback() {
                     @Override
                     public void onResponse(Response response) {
                         if (response != null) {
                             InputStream is = response.toStream();
-
                             final Bitmap bitmap = BitmapFactory.decodeStream(is);
-
                             handler.post(new Runnable() {
                                 @Override
                                 public void run() {
@@ -193,7 +196,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void httpDownload() {
         callDownload = client.newCall("http://f3.market.xiaomi.com/download/AppStore/0b3f6b4e06ff14b61065972a96149da822c86ad40/com.eg.android.AlipayGphone.apk");
-        callDownload.execute(new CallBack() {
+        callDownload.execute(new Callback() {
             @Override
             public void onResponse(Response response) {
                 try {

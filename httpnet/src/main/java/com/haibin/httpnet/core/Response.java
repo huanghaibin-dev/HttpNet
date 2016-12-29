@@ -15,6 +15,8 @@
  */
 package com.haibin.httpnet.core;
 
+import com.haibin.httpnet.core.io.IO;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -56,6 +58,8 @@ public class Response {
                 mBody = new String(os.toByteArray(), mEncode);
             } catch (IOException e) {
                 e.printStackTrace();
+            } finally {
+                close();
             }
         }
         return mBody;
@@ -71,5 +75,9 @@ public class Response {
 
     public int getContentLength() {
         return mContentLength;
+    }
+
+    public void close() {
+        IO.close(mInputStream);
     }
 }
