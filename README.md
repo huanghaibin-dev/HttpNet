@@ -1,7 +1,7 @@
 #HttpNet项目结构如下
 ![HttpNet项目结构](http://git.oschina.net/uploads/images/2016/0919/132807_3e935005_494015.png "HttpNet项目结构")
 
-HttpNet网络请求框架基于HttpUrlConnection，采用Client + Request + Call的请求模型，支持https默认证书，数字安全证书！后续将会实现队列、缓存模块。
+HttpNet网络请求框架基于HttpUrlConnection，采用Client + Request + Call的请求模型，支持HTTPS，支持同步和异步方法，支持Rxjava，支持上传和下载监听。
 
 如果用于Android开发，请使用[Elegant](http://git.oschina.net/huanghaibin_dev/Elegant)体验新的Android开发高潮，它的网络请求模块基于HttpNet，采用动态代理 + 构建的思想，致敬Retrofit！
 
@@ -9,6 +9,75 @@ HttpNet网络请求框架基于HttpUrlConnection，采用Client + Request + Call
 
 ```java
 compile 'com.haibin:httpnet:1.1.2'
+```
+
+##RxJava同步上传监听：
+```java
+final Request request = new Request.Builder()
+                .url("http://upload.cnblogs.com/ImageUploader/TemporaryAvatarUpload")
+                .method("POST")
+                .params(new RequestParams()
+                        .putFile("qqfile", "/storage/emulated/0/DCIM/Camera/339718150.jpeg"))
+                .headers(new Headers.Builder().addHeader("Cookie", "CNZZDATA1259029673=2072545293-1479795067-null%7C1479795067; lhb_smart_1=1; __utma=226521935.1789795872.1480996255.1480996255.1480996255.1; __utmz=226521935.1480996255.1.1.utmcsr=baidu|utmccn=(organic)|utmcmd=organic; .CNBlogsCookie=A6783E37E1040979421EC4A57A2FEFBB74B65BB51C7345AC99B64A7065293F59A79C6830C60D71629E8D28A332436E23CD40968EB58AA830CBD0F0733438F9A7627C074DB0462C2576D206D3752E640871E8CB23D1A50B0A9962C158466EE81425B1E516; _gat=1; _ga=GA1.2.1789795872.1480996255"))
+                .build();
+        Observable.create(new ObservableOnSubscribe<String>() {
+            @Override
+            public void subscribe(final ObservableEmitter<String> e) throws Exception {
+                client.newCall(request)
+                        .intercept(new InterceptListener() {
+                            @Override
+                            public void onProgress(int index, long currentLength, long totalLength) {
+                                Log.e("file", index + " -- " + " -- " + currentLength + " -- " + totalLength);
+                                e.onNext(index + " -- " + " -- " + currentLength + " -- " + totalLength);
+                            }
+                        })
+                        .execute();
+            }
+        }).subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<String>() {
+                    @Override
+                    public void accept(String response) throws Exception {
+                        Log.e("is", response);
+                        text.setText(response);
+                    }
+
+                });
+```
+
+##RxJava同步下载监听：
+```java
+
+Observable.create(new ObservableOnSubscribe<String>() {
+            @Override
+            public void subscribe(ObservableEmitter<String> e) throws Exception {
+                callDownload = client.newCall("http://f3.market.xiaomi.com/download/AppStore/0b3f6b4e06ff14b61065972a96149da822c86ad40/com.eg.android.AlipayGphone.apk");
+                Response response = callDownload.execute();
+                InputStream is = response.toStream();
+                File file = new File(Environment.getExternalStorageDirectory().getPath() + "/alipay.apk");
+                FileOutputStream os = new FileOutputStream(file);
+                int length = response.getContentLength();
+                int p = 0;
+                int bytes;
+                byte[] buffer = new byte[1024];
+                while ((bytes = is.read(buffer)) != -1) {
+                    os.write(buffer, 0, bytes);
+                    p += bytes;
+                    e.onNext(String.valueOf((p / (float) length) * 100));
+                }
+                response.close();
+            }
+        }).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<String>() {
+                    @Override
+                    public void accept(String s) throws Exception {
+                        text.setText(s);
+                        float f = Float.parseFloat(s);
+                        progressBar.setProgress((int) f);
+                    }
+                });
+
 ```
 
 ###默认支持Https认证，如果使用数字证书,在执行请求之前使用下面3种API导入证书即可
@@ -36,7 +105,7 @@ Request request = new Request.Builder()
 ```
 
 
-##GET请求构建:
+##GET异步请求构建:
 ```java
 
 Request request = new Request.Builder().encode("UTF-8")
@@ -46,7 +115,7 @@ Request request = new Request.Builder().encode("UTF-8")
                 .build();
 ```
 
-##POST请求构建:
+##POST异步请求构建:
 ```java
 
 RequestParams params = new RequestParams()
@@ -100,75 +169,6 @@ client.newCall(request)
                     @Override
                     public void onFailure(Exception e) {
                         Log.e("onFailure", " onFailure " + e.getMessage());
-                    }
-                });
-
-```
-
-##RxJava上传监听：
-```java
-final Request request = new Request.Builder()
-                .url("http://upload.cnblogs.com/ImageUploader/TemporaryAvatarUpload")
-                .method("POST")
-                .params(new RequestParams()
-                        .putFile("qqfile", "/storage/emulated/0/DCIM/Camera/339718150.jpeg"))
-                .headers(new Headers.Builder().addHeader("Cookie", "CNZZDATA1259029673=2072545293-1479795067-null%7C1479795067; lhb_smart_1=1; __utma=226521935.1789795872.1480996255.1480996255.1480996255.1; __utmz=226521935.1480996255.1.1.utmcsr=baidu|utmccn=(organic)|utmcmd=organic; .CNBlogsCookie=A6783E37E1040979421EC4A57A2FEFBB74B65BB51C7345AC99B64A7065293F59A79C6830C60D71629E8D28A332436E23CD40968EB58AA830CBD0F0733438F9A7627C074DB0462C2576D206D3752E640871E8CB23D1A50B0A9962C158466EE81425B1E516; _gat=1; _ga=GA1.2.1789795872.1480996255"))
-                .build();
-        Observable.create(new ObservableOnSubscribe<String>() {
-            @Override
-            public void subscribe(final ObservableEmitter<String> e) throws Exception {
-                client.newCall(request)
-                        .intercept(new InterceptListener() {
-                            @Override
-                            public void onProgress(int index, long currentLength, long totalLength) {
-                                Log.e("file", index + " -- " + " -- " + currentLength + " -- " + totalLength);
-                                e.onNext(index + " -- " + " -- " + currentLength + " -- " + totalLength);
-                            }
-                        })
-                        .execute();
-            }
-        }).subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<String>() {
-                    @Override
-                    public void accept(String response) throws Exception {
-                        Log.e("is", response);
-                        text.setText(response);
-                    }
-
-                });
-```
-
-##RxJava下载监听：
-```java
-
-Observable.create(new ObservableOnSubscribe<String>() {
-            @Override
-            public void subscribe(ObservableEmitter<String> e) throws Exception {
-                callDownload = client.newCall("http://f3.market.xiaomi.com/download/AppStore/0b3f6b4e06ff14b61065972a96149da822c86ad40/com.eg.android.AlipayGphone.apk");
-                Response response = callDownload.execute();
-                InputStream is = response.toStream();
-                File file = new File(Environment.getExternalStorageDirectory().getPath() + "/alipay.apk");
-                FileOutputStream os = new FileOutputStream(file);
-                int length = response.getContentLength();
-                int p = 0;
-                int bytes;
-                byte[] buffer = new byte[1024];
-                while ((bytes = is.read(buffer)) != -1) {
-                    os.write(buffer, 0, bytes);
-                    p += bytes;
-                    e.onNext(String.valueOf((p / (float) length) * 100));
-                }
-                response.close();
-            }
-        }).subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<String>() {
-                    @Override
-                    public void accept(String s) throws Exception {
-                        text.setText(s);
-                        float f = Float.parseFloat(s);
-                        progressBar.setProgress((int) f);
                     }
                 });
 
