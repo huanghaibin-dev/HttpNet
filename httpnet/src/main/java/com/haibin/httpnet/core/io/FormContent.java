@@ -49,7 +49,7 @@ public class FormContent extends HttpContent {
         IdentityHashMap<RequestParams.Key, String> texts = mParams.getTextParams();
         for (RequestParams.Key keys : set) {
             String key = urlEncode(keys.getName());
-            String value = urlEncode(texts.get(key));
+            String value = urlEncode(texts.get(keys));
             buffer.append(key + "=" + value + "&");
         }
     }

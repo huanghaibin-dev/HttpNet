@@ -121,7 +121,7 @@ public class MultiPartContent extends HttpContent {
         Set<RequestParams.Key> set = mParams.getTextParams().keySet();
         IdentityHashMap<RequestParams.Key, String> texts = mParams.getTextParams();
         for (RequestParams.Key keys : set) {
-            String value = texts.get(keys.getName());
+            String value = texts.get(keys);
             buffer.append(keys.getName() + "=" + value + "&");
         }
     }
