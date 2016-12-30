@@ -8,7 +8,7 @@ HttpNet网络请求框架基于HttpUrlConnection，采用Client + Request + Call
 ##gradle
 
 ```java
-compile 'com.haibin:httpnet:1.1.1'
+compile 'com.haibin:httpnet:1.1.2'
 ```
 
 ###默认支持Https认证，如果使用数字证书,在执行请求之前使用下面3种API导入证书即可
@@ -103,6 +103,40 @@ client.newCall(request)
                     }
                 });
 
+```
+
+##RxJava上传监听：
+```java
+final Request request = new Request.Builder()
+                .url("http://upload.cnblogs.com/ImageUploader/TemporaryAvatarUpload")
+                .method("POST")
+                .params(new RequestParams()
+                        .putFile("qqfile", "/storage/emulated/0/DCIM/Camera/339718150.jpeg"))
+                .headers(new Headers.Builder().addHeader("Cookie", "CNZZDATA1259029673=2072545293-1479795067-null%7C1479795067; lhb_smart_1=1; __utma=226521935.1789795872.1480996255.1480996255.1480996255.1; __utmz=226521935.1480996255.1.1.utmcsr=baidu|utmccn=(organic)|utmcmd=organic; .CNBlogsCookie=A6783E37E1040979421EC4A57A2FEFBB74B65BB51C7345AC99B64A7065293F59A79C6830C60D71629E8D28A332436E23CD40968EB58AA830CBD0F0733438F9A7627C074DB0462C2576D206D3752E640871E8CB23D1A50B0A9962C158466EE81425B1E516; _gat=1; _ga=GA1.2.1789795872.1480996255"))
+                .build();
+        Observable.create(new ObservableOnSubscribe<String>() {
+            @Override
+            public void subscribe(final ObservableEmitter<String> e) throws Exception {
+                client.newCall(request)
+                        .intercept(new InterceptListener() {
+                            @Override
+                            public void onProgress(int index, long currentLength, long totalLength) {
+                                Log.e("file", index + " -- " + " -- " + currentLength + " -- " + totalLength);
+                                e.onNext(index + " -- " + " -- " + currentLength + " -- " + totalLength);
+                            }
+                        })
+                        .execute();
+            }
+        }).subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<String>() {
+                    @Override
+                    public void accept(String response) throws Exception {
+                        Log.e("is", response);
+                        text.setText(response);
+                    }
+
+                });
 ```
 
 ##Licenses
