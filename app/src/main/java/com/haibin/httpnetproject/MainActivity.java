@@ -11,6 +11,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,11 +27,18 @@ import com.haibin.httpnet.core.io.JsonContent;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 
-public class MainActivity extends AppCompatActivity {
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Function;
+import io.reactivex.schedulers.Schedulers;
 
+public class MainActivity extends AppCompatActivity {
+    private ProgressBar progressBar;
     private ImageView iv;
     private TextView text;
     private Handler handler = new Handler();
@@ -51,15 +59,16 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         iv = (ImageView) findViewById(R.id.iv);
         text = (TextView) findViewById(R.id.text);
+        progressBar = (ProgressBar) findViewById(R.id.progressBar);
         AppContext.getRefWatcher().watch(this);
     }
 
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_execute:
-                //login();
-                //httpPostJson();
-                executeTest();
+                rxExecute();
+                //httpGet();
+                rxGetHttp();
                 break;
             case R.id.btn_cancel:
                 if (callExe != null) {
@@ -70,37 +79,46 @@ public class MainActivity extends AppCompatActivity {
                 }
                 break;
             case R.id.btn_download:
-                httpDownload();
+                rxDownload();
                 break;
         }
     }
 
-    public void executeTest() {
-        new Thread() {
-            @Override
-            public void run() {
-                try {
-                    Request request = new Request.Builder()
-                            .url("http://upload.cnblogs.com/ImageUploader/TemporaryAvatarUpload")
-                            .method("POST")
-                            .params(new RequestParams()
-                                    .putFile("qqfile", "/storage/emulated/0/DCIM/Camera/339718150.jpeg"))
-                            .headers(new Headers.Builder().addHeader("Cookie", "CNZZDATA1259029673=2072545293-1479795067-null%7C1479795067; lhb_smart_1=1; __utma=226521935.1789795872.1480996255.1480996255.1480996255.1; __utmz=226521935.1480996255.1.1.utmcsr=baidu|utmccn=(organic)|utmcmd=organic; .CNBlogsCookie=A6783E37E1040979421EC4A57A2FEFBB74B65BB51C7345AC99B64A7065293F59A79C6830C60D71629E8D28A332436E23CD40968EB58AA830CBD0F0733438F9A7627C074DB0462C2576D206D3752E640871E8CB23D1A50B0A9962C158466EE81425B1E516; _gat=1; _ga=GA1.2.1789795872.1480996255"))
-                            .build();
+    private void rxGetHttp() {
 
-                    final Response response = client.newCall(request).execute();
-                    if (response != null) {
-                        Log.e("is",response.getBody());
-//                        String body =  response.getBody();
-//                        if(body != null){
-//
-//                        }
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+    }
+
+    private void rxExecute() {
+        final Request request = new Request.Builder()
+                .url("http://upload.cnblogs.com/ImageUploader/TemporaryAvatarUpload")
+                .method("POST")
+                .params(new RequestParams()
+                        .putFile("qqfile", "/storage/emulated/0/DCIM/Camera/339718150.jpeg"))
+                .headers(new Headers.Builder().addHeader("Cookie", "CNZZDATA1259029673=2072545293-1479795067-null%7C1479795067; lhb_smart_1=1; __utma=226521935.1789795872.1480996255.1480996255.1480996255.1; __utmz=226521935.1480996255.1.1.utmcsr=baidu|utmccn=(organic)|utmcmd=organic; .CNBlogsCookie=A6783E37E1040979421EC4A57A2FEFBB74B65BB51C7345AC99B64A7065293F59A79C6830C60D71629E8D28A332436E23CD40968EB58AA830CBD0F0733438F9A7627C074DB0462C2576D206D3752E640871E8CB23D1A50B0A9962C158466EE81425B1E516; _gat=1; _ga=GA1.2.1789795872.1480996255"))
+                .build();
+        Observable.create(new ObservableOnSubscribe<String>() {
+            @Override
+            public void subscribe(final ObservableEmitter<String> e) throws Exception {
+                client.newCall(request)
+                        .intercept(new InterceptListener() {
+                            @Override
+                            public void onProgress(int index, long currentLength, long totalLength) {
+                                Log.e("file", index + " -- " + " -- " + currentLength + " -- " + totalLength);
+                                e.onNext(index + " -- " + " -- " + currentLength + " -- " + totalLength);
+                            }
+                        })
+                        .execute();
             }
-        }.start();
+        }).subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<String>() {
+                    @Override
+                    public void accept(String response) throws Exception {
+                        Log.e("is", response);
+                        text.setText(response);
+                    }
+
+                });
     }
 
     public void httpPostJson() {
@@ -171,57 +189,57 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void httpGet() {
-        client.newCall("http://img.pconline.com.cn/images/upload/upc/tx/wallpaper/1306/27/c4/22626360_1372304637240_800x800.jpg")
-                .execute(new Callback() {
+        Observable.create(new ObservableOnSubscribe<Response>() {
+            @Override
+            public void subscribe(ObservableEmitter<Response> e) throws Exception {
+                e.onNext(client.newCall("http://img.pconline.com.cn/images/upload/upc/tx/wallpaper/1306/27/c4/22626360_1372304637240_800x800.jpg").execute());
+            }
+        }).subscribeOn(Schedulers.io())
+                .map(new Function<Response, Bitmap>() {
                     @Override
-                    public void onResponse(Response response) {
-                        if (response != null) {
-                            InputStream is = response.toStream();
-                            final Bitmap bitmap = BitmapFactory.decodeStream(is);
-                            handler.post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    iv.setImageBitmap(bitmap);
-                                }
-                            });
-                        }
+                    public Bitmap apply(Response response) throws Exception {
+                        return BitmapFactory.decodeStream(response.toStream());
                     }
-
+                })
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<Bitmap>() {
                     @Override
-                    public void onFailure(Exception e) {
-                        Log.e("response", e.getMessage());
+                    public void accept(Bitmap bitmap) throws Exception {
+                        iv.setImageBitmap(bitmap);
                     }
                 });
+
     }
 
-    public void httpDownload() {
-        callDownload = client.newCall("http://f3.market.xiaomi.com/download/AppStore/0b3f6b4e06ff14b61065972a96149da822c86ad40/com.eg.android.AlipayGphone.apk");
-        callDownload.execute(new Callback() {
+    private void rxDownload() {
+        Observable.create(new ObservableOnSubscribe<String>() {
             @Override
-            public void onResponse(Response response) {
-                try {
-                    InputStream is = response.toStream();
-                    File file = new File(Environment.getExternalStorageDirectory().getPath() + "/alipay.apk");
-                    FileOutputStream os = new FileOutputStream(file);
-                    int length = response.getContentLength();
-                    int p = 0;
-                    int bytes = 0;
-                    byte[] buffer = new byte[1024];
-                    while ((bytes = is.read(buffer)) != -1) {
-                        os.write(buffer, 0, bytes);
-                        p += bytes;
-                        Log.e("progress", "进度==    " + (p / (float) length) * 100 + "%");
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    Log.e("Exception", e.getMessage());
+            public void subscribe(ObservableEmitter<String> e) throws Exception {
+                callDownload = client.newCall("http://f3.market.xiaomi.com/download/AppStore/0b3f6b4e06ff14b61065972a96149da822c86ad40/com.eg.android.AlipayGphone.apk");
+                Response response = callDownload.execute();
+                InputStream is = response.toStream();
+                File file = new File(Environment.getExternalStorageDirectory().getPath() + "/alipay.apk");
+                FileOutputStream os = new FileOutputStream(file);
+                int length = response.getContentLength();
+                int p = 0;
+                int bytes;
+                byte[] buffer = new byte[1024];
+                while ((bytes = is.read(buffer)) != -1) {
+                    os.write(buffer, 0, bytes);
+                    p += bytes;
+                    e.onNext(String.valueOf((p / (float) length) * 100));
                 }
+                response.close();
             }
-
-            @Override
-            public void onFailure(Exception e) {
-                Log.e("Exception", e.getMessage());
-            }
-        });
+        }).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<String>() {
+                    @Override
+                    public void accept(String s) throws Exception {
+                        text.setText(s);
+                        float f = Float.parseFloat(s);
+                        progressBar.setProgress((int) f);
+                    }
+                });
     }
 }

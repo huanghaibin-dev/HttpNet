@@ -16,7 +16,6 @@
 package com.haibin.httpnet.core.io;
 
 import java.io.Closeable;
-import java.io.IOException;
 
 /**
  * IO流操作
@@ -30,7 +29,7 @@ public final class IO {
                     continue;
                 }
                 cb.close();
-            } catch (IOException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }

@@ -32,7 +32,18 @@
         android:id="@+id/text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:layout_marginLeft="16dp"
         android:text="Hello World!" />
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_margin="16dp"
+        android:layout_marginLeft="16dp"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:max="100" />
 
     <ImageView
         android:id="@+id/iv"
