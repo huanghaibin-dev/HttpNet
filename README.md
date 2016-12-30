@@ -139,6 +139,41 @@ final Request request = new Request.Builder()
                 });
 ```
 
+##RxJava下载监听：
+```java
+
+Observable.create(new ObservableOnSubscribe<String>() {
+            @Override
+            public void subscribe(ObservableEmitter<String> e) throws Exception {
+                callDownload = client.newCall("http://f3.market.xiaomi.com/download/AppStore/0b3f6b4e06ff14b61065972a96149da822c86ad40/com.eg.android.AlipayGphone.apk");
+                Response response = callDownload.execute();
+                InputStream is = response.toStream();
+                File file = new File(Environment.getExternalStorageDirectory().getPath() + "/alipay.apk");
+                FileOutputStream os = new FileOutputStream(file);
+                int length = response.getContentLength();
+                int p = 0;
+                int bytes;
+                byte[] buffer = new byte[1024];
+                while ((bytes = is.read(buffer)) != -1) {
+                    os.write(buffer, 0, bytes);
+                    p += bytes;
+                    e.onNext(String.valueOf((p / (float) length) * 100));
+                }
+                response.close();
+            }
+        }).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<String>() {
+                    @Override
+                    public void accept(String s) throws Exception {
+                        text.setText(s);
+                        float f = Float.parseFloat(s);
+                        progressBar.setProgress((int) f);
+                    }
+                });
+
+```
+
 ##Licenses
 - Copyright (C) 2013 huanghaibin_dev <huanghaibin_dev@163.com>
  
