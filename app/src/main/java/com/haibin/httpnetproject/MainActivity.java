@@ -27,12 +27,16 @@ import com.haibin.httpnet.core.io.JsonContent;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.RandomAccessFile;
 
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
@@ -66,9 +70,9 @@ public class MainActivity extends AppCompatActivity {
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_execute:
-                rxExecute();
-                //httpGet();
-                rxGetHttp();
+//                rxExecute();
+//                //httpGet();
+//                rxGetHttp();
                 break;
             case R.id.btn_cancel:
                 if (callExe != null) {
@@ -79,13 +83,125 @@ public class MainActivity extends AppCompatActivity {
                 }
                 break;
             case R.id.btn_download:
-                rxDownload();
+                //rxDownload();
+                //rangeDownload();
+                rxRangeDownload();
                 break;
         }
     }
 
     private void rxGetHttp() {
 
+    }
+
+    /**
+     * RxJava方式断点下载
+     */
+    private void rxRangeDownload() {
+        final File rangeFile = new File(Environment.getExternalStorageDirectory().getPath() + "/cnblogs.apk");
+        final long readySize = rangeFile.exists() ? rangeFile.length() : 0;
+        Headers.Builder headers = new Headers.Builder()
+                .addHeader("Range", "bytes=" + readySize + "-");
+        Request request = new Request.Builder()
+                .url("http://f1.market.xiaomi.com/download/AppStore/0117653278abecee8762883a940e129e9d242ae7d/com.huanghaibin_dev.cnblogs.apk")
+                .headers(headers)
+                .build();
+        callDownload = client.newCall(request);
+        Observable.create(new ObservableOnSubscribe<String>() {
+            @Override
+            public void subscribe(ObservableEmitter<String> e) throws Exception {
+                try {
+                    Response response = callDownload.execute();
+                    InputStream is = response.toStream();
+                    RandomAccessFile randomAccessFile = new RandomAccessFile(rangeFile, "rw");
+                    randomAccessFile.seek(readySize);
+                    int length = response.getContentLength();
+                    length += readySize;
+                    int p = (int) readySize;
+                    int bytes;
+                    byte[] buffer = new byte[1024];
+                    while ((bytes = is.read(buffer)) != -1) {
+                        randomAccessFile.write(buffer, 0, bytes);
+                        p += bytes;
+                        e.onNext(String.valueOf((p / (float) length) * 100));
+                    }
+                    response.close();
+                } catch (Exception error) {
+                    error.printStackTrace();
+                    e.onError(error);
+                }
+            }
+        }).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<String>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onNext(String value) {
+                        text.setText(value);
+                        float f = Float.parseFloat(value);
+                        progressBar.setProgress((int) f);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
+    }
+
+    /**
+     * 断点下载案例
+     */
+    private void rangeDownload() {
+        final File rangeFile = new File(Environment.getExternalStorageDirectory().getPath() + "/cnblogs.apk");
+        final long readySize = rangeFile.exists() ? rangeFile.length() : 0;
+        Log.e("已经下载长度--- ", "  --   " + readySize);
+        Headers.Builder headers = new Headers.Builder()
+                .addHeader("Range", "bytes=" + readySize + "-");
+
+        Request request = new Request.Builder()
+                .url("http://f1.market.xiaomi.com/download/AppStore/0117653278abecee8762883a940e129e9d242ae7d/com.huanghaibin_dev.cnblogs.apk")
+                .headers(headers)
+                .build();
+        callDownload = client.newCall(request);
+        callDownload.execute(new Callback() {
+            @Override
+            public void onResponse(Response response) {
+                try {
+                    InputStream is = response.toStream();
+                    RandomAccessFile randomAccessFile = new RandomAccessFile(rangeFile, "rw");
+                    randomAccessFile.seek(readySize);
+                    int length = response.getContentLength();
+                    Log.e("服务器数据长度为--- ", "  --   " + length);
+                    length += readySize;
+                    int p = (int) readySize;
+                    int bytes;
+                    byte[] buffer = new byte[1024];
+                    while ((bytes = is.read(buffer)) != -1) {
+                        randomAccessFile.write(buffer, 0, bytes);
+                        p += bytes;
+                        Log.e("下载进度：", String.valueOf((p / (float) length) * 100));
+                    }
+                    response.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+
+            }
+        });
     }
 
     private void rxExecute() {
@@ -99,7 +215,7 @@ public class MainActivity extends AppCompatActivity {
         Observable.create(new ObservableOnSubscribe<String>() {
             @Override
             public void subscribe(final ObservableEmitter<String> e) throws Exception {
-                client.newCall(request)
+                Response response = client.newCall(request)
                         .intercept(new InterceptListener() {
                             @Override
                             public void onProgress(int index, long currentLength, long totalLength) {
@@ -108,16 +224,35 @@ public class MainActivity extends AppCompatActivity {
                             }
                         })
                         .execute();
+                if (response == null) {
+                    e.onError(new IOException());
+                }
+                e.onComplete();
+
             }
         }).subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<String>() {
+                .subscribe(new Observer<String>() {
                     @Override
-                    public void accept(String response) throws Exception {
-                        Log.e("is", response);
-                        text.setText(response);
+                    public void onSubscribe(Disposable d) {
+                        Log.e("onSubscribe", "onSubscribe");
                     }
 
+                    @Override
+                    public void onNext(String value) {
+                        Log.e("is", value);
+                        text.setText(value);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Log.e("网络错误", "网络错误");
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        Log.e("onComplete", "onComplete");
+                    }
                 });
     }
 
@@ -211,6 +346,9 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * RxJava下载
+     */
     private void rxDownload() {
         Observable.create(new ObservableOnSubscribe<String>() {
             @Override
