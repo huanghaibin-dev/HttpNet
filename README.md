@@ -11,6 +11,69 @@ HttpNet网络请求框架基于HttpUrlConnection，采用Client + Request + Call
 compile 'com.haibin:httpnet:1.1.3'
 ```
 
+##RxJava断点下载
+```java
+final File rangeFile = new File(Environment.getExternalStorageDirectory().getPath() + "/cnblogs.apk");
+final long readySize = rangeFile.exists() ? rangeFile.length() : 0;
+Headers.Builder headers = new Headers.Builder()
+                .addHeader("Range", "bytes=" + readySize + "-");
+Request request = new Request.Builder()
+          .url("http://f1.market.xiaomi.com/download/
+                AppStore/0117653278abecee8762883a940e129e9d242ae7d/com.huanghaibin_dev.cnblogs.apk")
+           .headers(headers)
+           .build();
+callDownload = client.newCall(request);//调用callDownload.cancel();取消请求实现暂停，再次请求即可从断点位置继续下载
+Observable.create(new ObservableOnSubscribe<String>() {
+            @Override
+            public void subscribe(ObservableEmitter<String> e) throws Exception {
+                try {
+                    Response response = callDownload.execute();
+                    InputStream is = response.toStream();
+                    RandomAccessFile randomAccessFile = new RandomAccessFile(rangeFile, "rw");
+                    randomAccessFile.seek(readySize);
+                    int length = response.getContentLength();
+                    length += readySize;
+                    int p = (int) readySize;
+                    int bytes;
+                    byte[] buffer = new byte[1024];
+                    while ((bytes = is.read(buffer)) != -1) {
+                        randomAccessFile.write(buffer, 0, bytes);
+                        p += bytes;
+                        e.onNext(String.valueOf((p / (float) length) * 100));
+                    }
+                    response.close();
+                } catch (Exception error) {
+                    error.printStackTrace();
+                    e.onError(error);
+                }
+            }
+        }).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<String>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onNext(String value) {
+                        text.setText(value);
+                        float f = Float.parseFloat(value);
+                        progressBar.setProgress((int) f);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
+```
+
 ##RxJava同步上传监听：
 ```java
 final Request request = new Request.Builder()
