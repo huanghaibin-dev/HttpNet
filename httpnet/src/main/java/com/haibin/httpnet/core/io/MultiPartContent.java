@@ -30,7 +30,7 @@ import java.util.Set;
 /**
  * HTTP MultiPart RequestBody，请全体包括文本、文件流等
  */
-@SuppressWarnings("all")
+@SuppressWarnings("unused")
 public class MultiPartContent extends HttpContent {
     private InterceptListener mListener = null;
 

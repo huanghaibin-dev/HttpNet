@@ -28,15 +28,16 @@ import java.net.URLEncoder;
  * 定义HttpContent 传输数据，使用策略模式 ********* JsonContent
  * ***** MultiPartContent
  */
+@SuppressWarnings("unused")
 public abstract class HttpContent {
-     public static final String BOUNDARY = "http-net";
-     static final String DATA_TAG = "--";
-     static final String END = "\r\n";
-     String mEncode;
-     RequestParams mParams;
-     DataOutputStream mOutputStream;
+    public static final String BOUNDARY = "http-net";
+    static final String DATA_TAG = "--";
+    static final String END = "\r\n";
+    String mEncode;
+    RequestParams mParams;
+    DataOutputStream mOutputStream;
 
-     HttpContent(RequestParams mParams, String encode) {
+    HttpContent(RequestParams mParams, String encode) {
         this.mEncode = encode == null ? "UTF-8" : encode;
         this.mParams = mParams;
     }
@@ -45,9 +46,12 @@ public abstract class HttpContent {
         this.mOutputStream = outputStream;
     }
 
+    /**
+     * URL编码表单
+     */
     String urlEncode(String value) {
         try {
-            return URLEncoder.encode(value, mEncode);
+            return URLEncoder.encode(value, "UTF-8");
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
             return null;

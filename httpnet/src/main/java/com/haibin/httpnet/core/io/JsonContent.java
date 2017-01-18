@@ -22,6 +22,7 @@ import java.io.IOException;
 /**
  * Json POST请求
  */
+@SuppressWarnings("unused")
 public class JsonContent extends HttpContent {
     private String mJson;
 
