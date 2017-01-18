@@ -1,7 +1,7 @@
 #HttpNet项目结构如下
 ![HttpNet项目结构](http://git.oschina.net/uploads/images/2016/0919/132807_3e935005_494015.png "HttpNet项目结构")
 
-HttpNet网络请求框架基于HttpUrlConnection，采用Client + Request + Call的请求模型，支持HTTPS，支持同步和异步方法，支持Rxjava，支持上传和下载监听。
+HttpNet网络请求框架基于HttpUrlConnection，采用Client + Request + Call的请求模型，支持HTTPS，支持同步和异步方法，支持Rxjava，支持上传和下载监听，同步请求配合RxJava十分方便实现线程切换
 
 如果用于Android开发，请使用[Elegant](http://git.oschina.net/huanghaibin_dev/Elegant)体验新的Android开发高潮，它的网络请求模块基于HttpNet，采用动态代理 + 构建的思想，致敬Retrofit！
 
