@@ -36,7 +36,7 @@ import javax.net.ssl.TrustManagerFactory;
 /**
  * using https ssl 证书管理工具
  */
-@SuppressWarnings("unused")
+@SuppressWarnings("all")
 public final class SSLManager {
 
     private static SSLSocketFactory mDefaultSslSocketFactory;

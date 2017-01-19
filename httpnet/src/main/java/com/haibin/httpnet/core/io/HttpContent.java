@@ -69,8 +69,4 @@ public abstract class HttpContent {
         mOutputStream.flush();
         mOutputStream.close();
     }
-
-    public long getContentLength() {
-        return 0;
-    }
 }

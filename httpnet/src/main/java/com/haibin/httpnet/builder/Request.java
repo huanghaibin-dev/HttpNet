@@ -23,6 +23,7 @@ import com.haibin.httpnet.core.io.MultiPartContent;
  * to build a request
  * 构建一个请求
  */
+@SuppressWarnings("unused")
 public final class Request {
     private String mUrl;
     private String mMethod;

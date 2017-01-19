@@ -17,12 +17,11 @@ package com.haibin.httpnet.builder;
 
 import java.io.File;
 import java.util.IdentityHashMap;
-import java.util.Map;
 
 /**
  *
  */
-@SuppressWarnings("unused")
+@SuppressWarnings("all")
 public final class RequestParams {
     private IdentityHashMap<Key, String> textParams;
     private IdentityHashMap<Key, File> multiParams;

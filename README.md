@@ -8,7 +8,7 @@ HttpNet网络请求框架基于HttpUrlConnection，采用Client + Request + Call
 ##gradle
 
 ```java
-compile 'com.haibin:httpnet:1.1.4'
+compile 'com.haibin:httpnet:1.1.5'
 ```
 
 ##RxJava断点下载

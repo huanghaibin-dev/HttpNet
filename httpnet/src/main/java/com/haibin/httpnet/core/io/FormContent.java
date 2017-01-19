@@ -50,7 +50,7 @@ public class FormContent extends HttpContent {
         for (RequestParams.Key keys : set) {
             String key = urlEncode(keys.getName());
             String value = urlEncode(texts.get(keys));
-            buffer.append(key + "=" + value + "&");
+            buffer.append(key).append("=").append(value).append("&");
         }
     }
 
@@ -61,10 +61,5 @@ public class FormContent extends HttpContent {
         StringBuffer buffer = new StringBuffer();
         intoString(buffer);
         return buffer.substring(0, buffer.length() - 1);
-    }
-
-    @Override
-    public long getContentLength() {
-        return intoString().length();
     }
 }

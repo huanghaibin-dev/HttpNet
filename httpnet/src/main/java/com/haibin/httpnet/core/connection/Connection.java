@@ -15,6 +15,8 @@
  */
 package com.haibin.httpnet.core.connection;
 
+import android.text.TextUtils;
+
 import com.haibin.httpnet.HttpNetClient;
 import com.haibin.httpnet.builder.Headers;
 import com.haibin.httpnet.builder.Request;
@@ -44,73 +46,41 @@ public abstract class Connection {
     DataOutputStream mOutputStream;
     InputStream mInputStream;
 
-    Connection(HttpNetClient client) {
+    Connection(HttpNetClient client, Request request) {
         this.mClient = client;
+        this.mRequest = request;
     }
 
-    public void connect(Request request, Callback callBack) {
-        this.mRequest = request;
-
+    public void connect(Callback callBack) {
         try {
-            String host = mRequest.host();
-            String method = mRequest.method().toUpperCase();
-            URL url = new URL(getHttpUrl(mRequest));
-
-            if (host == null && mClient.getProxy() == null) {
-                mUrlConnection = url.openConnection();
-            } else {
-                mUrlConnection = url.openConnection(host != null ? new Proxy(Proxy.Type.HTTP, new InetSocketAddress(host, mRequest.port())) : mClient.getProxy());
-            }
-
-            initHeaders();
-
-            connect(mUrlConnection, mRequest.method());
-
-            switch (method) {
-                case "GET":
-                    get();
-                    break;
-                case "POST":
-                    post();
-                    break;
-                case "DELETE":
-                    delete();
-                    break;
-                case "PUT":
-                    put();
-                    break;
-                case "PATCH":
-                    patch();
-                    break;
-            }
-            mInputStream = mUrlConnection.getInputStream();
+            doInit();
             onResponse(callBack);
-            callBack = null;
         } catch (IOException e) {
             e.printStackTrace();
             callBack.onFailure(e);
         } finally {
             finish();
         }
-
     }
 
-    public Response connect(Request request) throws IOException {
-        this.mRequest = request;
-        String host = mRequest.host();
+    public Response connect() throws IOException {
+        doInit();
+        return getResponse();
+    }
+
+    private void doInit() throws IOException {
+        Proxy proxy = TextUtils.isEmpty(mRequest.host()) ?
+                mClient.getProxy() :
+                new Proxy(Proxy.Type.HTTP, new InetSocketAddress(mRequest.host(), mRequest.port()));
         String method = mRequest.method().toUpperCase();
         URL url = new URL(getHttpUrl(mRequest));
-
-        if (host == null && mClient.getProxy() == null) {
+        if (proxy == null) {
             mUrlConnection = url.openConnection();
         } else {
-            mUrlConnection = url.openConnection(host != null ? new Proxy(Proxy.Type.HTTP, new InetSocketAddress(host, mRequest.port())) : mClient.getProxy());
+            mUrlConnection = url.openConnection(proxy);
         }
-
         initHeaders();
-
-        connect(mUrlConnection, mRequest.method());
-
+        connect(mUrlConnection, method);
         switch (method) {
             case "GET":
                 get();
@@ -129,7 +99,6 @@ public abstract class Connection {
                 break;
         }
         mInputStream = mUrlConnection.getInputStream();
-        return getResponse();
     }
 
     abstract void connect(URLConnection connection, String method) throws IOException;

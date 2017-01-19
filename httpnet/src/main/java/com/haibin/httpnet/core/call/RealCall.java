@@ -22,7 +22,7 @@ import com.haibin.httpnet.core.Response;
 import java.io.IOException;
 
 /**
- *
+ * 请求的真正代理实现
  */
 public class RealCall implements Call {
     private HttpNetClient mClient;

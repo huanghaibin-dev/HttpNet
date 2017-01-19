@@ -22,6 +22,9 @@ import java.io.Closeable;
  */
 
 public final class IO {
+    /**
+     * 关闭流
+     */
     public static void close(Closeable... closeables) {
         for (Closeable cb : closeables) {
             try {

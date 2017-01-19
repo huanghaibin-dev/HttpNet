@@ -17,6 +17,7 @@ package com.haibin.httpnet.core.connection;
 
 
 import com.haibin.httpnet.HttpNetClient;
+import com.haibin.httpnet.builder.Request;
 import com.haibin.httpnet.core.Response;
 import com.haibin.httpnet.core.call.Callback;
 import com.haibin.httpnet.core.call.InterceptListener;
@@ -36,12 +37,12 @@ public class HttpConnection extends Connection {
     private HttpURLConnection mHttpUrlConnection;
     private InterceptListener mListener;
 
-    public HttpConnection(HttpNetClient client) {
-        super(client);
+    public HttpConnection(HttpNetClient client, Request request) {
+        super(client, request);
     }
 
-    public HttpConnection(HttpNetClient client, InterceptListener listener) {
-        super(client);
+    public HttpConnection(HttpNetClient client, Request request, InterceptListener listener) {
+        super(client, request);
         this.mListener = listener;
     }
 

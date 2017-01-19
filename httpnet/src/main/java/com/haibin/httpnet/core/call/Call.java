@@ -24,11 +24,31 @@ import java.io.IOException;
  */
 public interface Call {
 
+    /**
+     * 添加拦截上传监听
+     *
+     * @param listener 请求监听
+     * @return call
+     */
     Call intercept(InterceptListener listener);
 
-    void execute(Callback callBack);//执行一个请求
+    /**
+     * 异步执行一个请求
+     *
+     * @param callBack 回调
+     */
+    void execute(Callback callBack);
 
+    /**
+     * 同步执行一个请求，必须在子线程执行
+     *
+     * @return 请求结果
+     * @throws IOException 异常
+     */
     Response execute() throws IOException;
 
-    void cancel();//取消一个http请求
+    /**
+     * 取消一个http请求
+     */
+    void cancel();
 }

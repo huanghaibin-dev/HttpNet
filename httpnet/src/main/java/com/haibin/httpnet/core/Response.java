@@ -26,7 +26,7 @@ import java.util.Map;
 /**
  * the request response
  */
-
+@SuppressWarnings("unused")
 public class Response {
     private Map<String, List<String>> mHeaders;
     private int mCode;
@@ -43,10 +43,20 @@ public class Response {
         this.mContentLength = contentLength;
     }
 
+    /**
+     * 返回状态码
+     *
+     * @return http  code
+     */
     public int getCode() {
         return mCode;
     }
 
+    /**
+     * 获取返回body
+     *
+     * @return 转为字符串
+     */
     public String getBody() {
         if (mBody == null) {
             try {
@@ -65,18 +75,36 @@ public class Response {
         return mBody;
     }
 
+    /**
+     * 返回数据流
+     *
+     * @return 获取流用于文件处理
+     */
     public InputStream toStream() {
         return mInputStream;
     }
 
+    /**
+     * 获取响应头
+     *
+     * @return 响应头
+     */
     public Map<String, List<String>> getHeaders() {
         return mHeaders;
     }
 
+    /**
+     * 获取内容长度
+     *
+     * @return 内容长度
+     */
     public int getContentLength() {
         return mContentLength;
     }
 
+    /**
+     * 关闭流
+     */
     public void close() {
         IO.close(mInputStream);
     }

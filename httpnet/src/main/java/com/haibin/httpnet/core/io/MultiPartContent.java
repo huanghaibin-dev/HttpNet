@@ -24,7 +24,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.IdentityHashMap;
-import java.util.Iterator;
 import java.util.Set;
 
 /**
@@ -68,9 +67,10 @@ public class MultiPartContent extends HttpContent {
         IdentityHashMap<RequestParams.Key, String> texts = mParams.getTextParams();
         for (RequestParams.Key keys : set) {
             String key = urlEncode(keys.getName());
-            String value = urlEncode(texts.get(key));
+            String value;
+            value = urlEncode(texts.get(keys));
             buffer.append(END + DATA_TAG + BOUNDARY + END);
-            buffer.append("Content-Disposition: form-data; name=\"" + key + "\"");
+            buffer.append("Content-Disposition: form-data; name=\"").append(key).append("\"");
             buffer.append(END + END);
             buffer.append(value);
         }
@@ -82,14 +82,14 @@ public class MultiPartContent extends HttpContent {
         IdentityHashMap<RequestParams.Key, File> fileMap = mParams.getMultiParams();
         int index = 0;
         for (RequestParams.Key keys : set) {
-            StringBuffer buffer = new StringBuffer();
+            StringBuilder buffer = new StringBuilder();
             String key = urlEncode(keys.getName());
             File file = fileMap.get(keys);
             String fileName = file.getName();
             buffer.append(END + DATA_TAG + BOUNDARY + END);
-            buffer.append("Content-Disposition: form-data; name=\"" + key + "\"; filename=\"" + fileName + "\"");
+            buffer.append("Content-Disposition: form-data; name=\"").append(key).append("\"; filename=\"").append(fileName).append("\"");
             buffer.append(END);
-            buffer.append("Content-Type: " + ContentTypeFactory.getInstance().getContentType(fileName));
+            buffer.append("Content-Type: ").append(ContentTypeFactory.getInstance().getContentType(fileName));
             buffer.append(END + END);
             mOutputStream.writeBytes(buffer.toString());
             outputFile(file, index);
@@ -121,8 +121,9 @@ public class MultiPartContent extends HttpContent {
         Set<RequestParams.Key> set = mParams.getTextParams().keySet();
         IdentityHashMap<RequestParams.Key, String> texts = mParams.getTextParams();
         for (RequestParams.Key keys : set) {
-            String value = texts.get(keys);
-            buffer.append(keys.getName() + "=" + value + "&");
+            String key = urlEncode(keys.getName());
+            String value = urlEncode(texts.get(keys));
+            buffer.append(keys.getName()).append("=").append(value).append("&");
         }
     }
 
@@ -131,31 +132,5 @@ public class MultiPartContent extends HttpContent {
         StringBuffer buffer = new StringBuffer();
         intoString(buffer);
         return buffer.substring(0, buffer.length() - 1);
-    }
-
-    @Override
-    public long getContentLength() {
-        long length = 0;
-        IdentityHashMap<RequestParams.Key, String> text = mParams.getTextParams();
-        IdentityHashMap<RequestParams.Key, File> multi = mParams.getMultiParams();
-        if (text != null) {
-            Set<RequestParams.Key> set = text.keySet();
-            for (RequestParams.Key keys : set) {
-                length += (END + DATA_TAG + BOUNDARY + END + "Content-Disposition: form-data; name=\"" + keys.getName() + "\"" + END + END).length();
-            }
-        }
-        if (multi != null) {
-            Set<RequestParams.Key> set = multi.keySet();
-            for (Iterator<RequestParams.Key> iterator = set.iterator(); iterator.hasNext(); ) {
-                String key = iterator.next().getName();
-                File file = multi.get(key);
-                String fileName = file.getName();
-                length += ("Content-Disposition: form-data; name=\"" + key + "\"; filename=\"" + fileName + "\""
-                        + END
-                        + "Content-Type: " + ContentTypeFactory.getInstance().getContentType(fileName)
-                        + END + END).length() + file.length();
-            }
-        }
-        return length;
     }
 }

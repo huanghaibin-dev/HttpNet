@@ -33,6 +33,11 @@ public final class Dispatcher {
         this.mExecutorService = new ThreadPoolExecutor(3, Integer.MAX_VALUE, 60L, TimeUnit.SECONDS, new SynchronousQueue<Runnable>());
     }
 
+    /**
+     * 执行一个异步请求
+     *
+     * @param call 请求
+     */
     public void execute(AsyncCall call) {
         this.mExecutorService.execute(call);
     }

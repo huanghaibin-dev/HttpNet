@@ -23,6 +23,7 @@ import java.util.Map;
 /**
  * the http/https header
  */
+@SuppressWarnings("unused")
 public class Headers {
     private Map<String, List<String>> mHeaders;
 

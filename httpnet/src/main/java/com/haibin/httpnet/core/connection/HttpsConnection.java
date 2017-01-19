@@ -17,10 +17,12 @@ package com.haibin.httpnet.core.connection;
 
 
 import com.haibin.httpnet.HttpNetClient;
+import com.haibin.httpnet.builder.Request;
 import com.haibin.httpnet.core.Response;
 import com.haibin.httpnet.core.call.Callback;
 import com.haibin.httpnet.core.call.InterceptListener;
 import com.haibin.httpnet.core.io.HttpContent;
+import com.haibin.httpnet.core.io.IO;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -36,12 +38,12 @@ public class HttpsConnection extends Connection {
     private HttpsURLConnection mHttpsUrlConnection;
     private InterceptListener mListener;
 
-    public HttpsConnection(HttpNetClient client) {
-        super(client);
+    public HttpsConnection(HttpNetClient client, Request request) {
+        super(client, request);
     }
 
-    public HttpsConnection(HttpNetClient client, InterceptListener listener) {
-        super(client);
+    public HttpsConnection(HttpNetClient client, Request request, InterceptListener listener) {
+        super(client, request);
         this.mListener = listener;
     }
 
@@ -114,6 +116,6 @@ public class HttpsConnection extends Connection {
 
     @Override
     void finish() {
-
+        IO.close(mOutputStream, mInputStream);
     }
 }

@@ -25,7 +25,7 @@ import com.haibin.httpnet.core.connection.HttpsConnection;
 import java.io.IOException;
 
 /**
- *
+ * 请求的封装执行
  */
 
 public class AsyncCall implements Runnable {
@@ -36,16 +36,18 @@ public class AsyncCall implements Runnable {
     AsyncCall(HttpNetClient client, Request request, Callback callBack, InterceptListener listener) {
         this.mCallBack = callBack;
         this.mRequest = request;
-        mConnection = request.url().startsWith("https") ? new HttpsConnection(client, listener) : new HttpConnection(client, listener);
+        mConnection = request.url().startsWith("https") ?
+                new HttpsConnection(client, request, listener) :
+                new HttpConnection(client, request, listener);
     }
 
     @Override
     public void run() {
-        mConnection.connect(mRequest, mCallBack);
+        mConnection.connect(mCallBack);
     }
 
     public Response execute() throws IOException {
-        return mConnection.connect(mRequest);
+        return mConnection.connect();
     }
 
     public Request getRequest() {

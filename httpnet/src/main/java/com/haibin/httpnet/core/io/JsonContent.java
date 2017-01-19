@@ -50,7 +50,6 @@ public class JsonContent extends HttpContent {
         if (mJson != null) {
             mOutputStream.write(mJson.getBytes(mEncode));
         }
-        //outputEnd();
     }
 
     @Override
@@ -63,8 +62,4 @@ public class JsonContent extends HttpContent {
         return mJson;
     }
 
-    @Override
-    public long getContentLength() {
-        return mJson.length();
-    }
 }
