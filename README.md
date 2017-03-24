@@ -5,13 +5,13 @@ HttpNet网络请求框架基于HttpUrlConnection，采用Client + Request + Call
 
 如果用于Android开发，请使用[Elegant](http://git.oschina.net/huanghaibin_dev/Elegant)体验新的Android开发高潮，它的网络请求模块基于HttpNet，采用动态代理 + 构建的思想，致敬Retrofit！
 
-##gradle
+## gradle
 
 ```java
 compile 'com.haibin:httpnet:1.1.5'
 ```
 
-##RxJava断点下载
+## RxJava断点下载
 ```java
 final File rangeFile = new File(Environment.getExternalStorageDirectory().getPath() + "/cnblogs.apk");
 final long readySize = rangeFile.exists() ? rangeFile.length() : 0;
@@ -74,7 +74,7 @@ Observable.create(new ObservableOnSubscribe<String>() {
                 });
 ```
 
-##RxJava同步上传监听：
+## RxJava同步上传监听：
 ```java
 final Request request = new Request.Builder()
                 .url("http://upload.cnblogs.com/ImageUploader/TemporaryAvatarUpload")
@@ -108,7 +108,7 @@ final Request request = new Request.Builder()
                 });
 ```
 
-##RxJava同步下载监听：
+## RxJava同步下载监听：
 ```java
 
 Observable.create(new ObservableOnSubscribe<String>() {
@@ -143,7 +143,7 @@ Observable.create(new ObservableOnSubscribe<String>() {
 
 ```
 
-###默认支持Https CA认证证书，如果使用自签名证书,在执行请求之前使用下面3种API导入证书即可
+### 默认支持Https CA认证证书，如果使用自签名证书,在执行请求之前使用下面3种API导入证书即可
 
 ```java
 
@@ -168,7 +168,7 @@ Request request = new Request.Builder()
 ```
 
 
-##GET异步请求构建:
+## GET异步请求构建:
 ```java
 
 Request request = new Request.Builder().encode("UTF-8")
@@ -178,7 +178,7 @@ Request request = new Request.Builder().encode("UTF-8")
                 .build();
 ```
 
-##POST异步请求构建:
+## POST异步请求构建:
 ```java
 
 RequestParams params = new RequestParams()
@@ -194,7 +194,7 @@ RequestParams params = new RequestParams()
                 .build();
 ```
 
-##POST JSON请求构建:
+## POST JSON请求构建:
 ```java
 
 Request request = new Request.Builder()
@@ -207,7 +207,7 @@ Request request = new Request.Builder()
        
 ```
 
-##执行请求:
+## 执行请求:
 ```java
 
 HttpNetClient client = new HttpNetClient();
@@ -237,7 +237,7 @@ client.newCall(request)
 
 ```
 
-##Licenses
+## Licenses
 - Copyright (C) 2013 huanghaibin_dev <huanghaibin_dev@163.com>
  
 - Licensed under the Apache License, Version 2.0 (the "License");
