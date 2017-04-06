@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2016 huanghaibin_dev <huanghaibin_dev@163.com>
- * WebSite https://github.com/MiracleTimes-Dev
+ * WebSite https://github.com/huanghaibin_dev
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -59,29 +59,85 @@ public final class SSLManager {
         this.mSslSocketFactory = sslSocketFactory;
     }
 
-    public static KeyStore getKeyStore(String keyStorePath, String pwd) throws Exception {
-        KeyStore ks = KeyStore.getInstance("JKS");
-        FileInputStream is = new FileInputStream(keyStorePath);
+    /**
+     * 采用该方式自行构建 KeyStore
+     *
+     * @param is   keystore 文件流
+     * @param pwd  keystrore 密码
+     * @param type 证书类型，java默认的JKS或android的BKS
+     * @return KeyStore
+     * @throws Exception 类型错误
+     */
+    public static KeyStore getKeyStore(InputStream is, String pwd, String type) throws Exception {
+        KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
         ks.load(is, pwd.toCharArray());
         is.close();
         return ks;
     }
 
-    public static SSLContext getSSLContext(String keyStorePath, String pwd, String trustStorePath) throws Exception {
+    /**
+     * 如果使用SSL双向验证，即需要客户端证书和客户端私钥，则采用以下方式
+     *
+     * @param keyStoreStream   客户端证书流
+     * @param keyPwd           客户端证书密码
+     * @param trustStoreStream 信任TrustStore.keystrore 流
+     * @param truesPwd         信任TrustStore.keystrore 密码
+     * @return SSLContext
+     * @throws Exception 异常
+     */
+    public static SSLContext getSSLContext(InputStream keyStoreStream, String keyPwd, InputStream trustStoreStream, String truesPwd) throws Exception {
         KeyManagerFactory keyManagerFactory = KeyManagerFactory
                 .getInstance(KeyManagerFactory.getDefaultAlgorithm());
-        KeyStore keyStore = getKeyStore(pwd, keyStorePath);
-        keyManagerFactory.init(keyStore, pwd.toCharArray());
+        KeyStore keyStore = getKeyStore(keyStoreStream, keyPwd, "");
+        keyManagerFactory.init(keyStore, keyPwd.toCharArray());
         TrustManagerFactory trustManagerFactory = TrustManagerFactory
                 .getInstance(TrustManagerFactory.getDefaultAlgorithm());
-        KeyStore trustStore = getKeyStore(pwd, trustStorePath);
+        KeyStore trustStore = getKeyStore(trustStoreStream, truesPwd, "");
         trustManagerFactory.init(trustStore);
-        SSLContext sslContext = SSLContext.getInstance("TLS");
+        SSLContext sslContext = SSLContext.getInstance("TSL");
+        CertificateFactory certificatefactory = CertificateFactory.getInstance("X.509");
+        X509Certificate cert = (X509Certificate) certificatefactory.generateCertificate(keyStoreStream);
+        keyStore.setCertificateEntry("ca", cert);
         sslContext.init(keyManagerFactory.getKeyManagers(),
                 trustManagerFactory.getTrustManagers(), null);
         return sslContext;
     }
 
+    public static SSLContext getSSLContext(InputStream keyStoreStream, InputStream trustStoreStream, String truesPwd,InputStream t) throws Exception {
+        try {
+            CertificateFactory certificatefactory = CertificateFactory.getInstance("X.509");
+            KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
+            keyStore.load(null);
+            X509Certificate cert = (X509Certificate) certificatefactory.generateCertificate(keyStoreStream);
+            keyStore.setCertificateEntry("ca", cert);
+            IO.close(keyStoreStream);
+
+            KeyManagerFactory keyManagerFactory = KeyManagerFactory
+                    .getInstance(KeyManagerFactory.getDefaultAlgorithm());
+            keyManagerFactory.init(keyStore, truesPwd.toCharArray());
+
+            SSLContext sslContext = SSLContext.getInstance("TLS");
+
+            TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());//信任证书管理工厂
+            KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
+            trustStore.load(trustStoreStream, truesPwd.toCharArray());
+
+            X509Certificate trues = (X509Certificate) certificatefactory.generateCertificate(t);
+            trustStore.setCertificateEntry("ca", cert);
+
+            trustManagerFactory.init(trustStore);
+            IO.close(trustStoreStream,t);
+
+            sslContext.init(keyManagerFactory.getKeyManagers(), trustManagerFactory.getTrustManagers(), new SecureRandom());
+
+            return sslContext;
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            IO.close(keyStoreStream, trustStoreStream);
+        }
+        return null;
+    }
 
     /**
      * 添加证书文件流，可添加多个
@@ -97,7 +153,7 @@ public final class SSLManager {
                 keyStore.setCertificateEntry("alias" + index++, cert);
             }
 
-            SSLContext sslContext = SSLContext.getInstance("TLS");//安全数据层
+            SSLContext sslContext = SSLContext.getInstance("TLSv1","AndroidOpenSSL");//安全数据层
 
             TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());//信任证书管理工厂
 

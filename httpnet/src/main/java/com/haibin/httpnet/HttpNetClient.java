@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2016 huanghaibin_dev <huanghaibin_dev@163.com>
- * WebSite https://github.com/MiracleTimes-Dev
+ * WebSite https://github.com/huanghaibin_dev
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -97,6 +97,10 @@ public final class HttpNetClient {
     public HttpNetClient setSslSocketFactoryAsString(String... cerValues) {
         mSslManager.setSslSocketFactoryAsString(cerValues);
         return this;
+    }
+
+    public void cancelAll() {
+        mDispatcher.shutdown();
     }
 
     public SSLSocketFactory getSslSocketFactory() {

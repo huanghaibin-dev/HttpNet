@@ -41,6 +41,7 @@ import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 
+@SuppressWarnings("all")
 public class MainActivity extends AppCompatActivity {
     private ProgressBar progressBar;
     private ImageView iv;
@@ -49,13 +50,16 @@ public class MainActivity extends AppCompatActivity {
     private Call callExe;
 
     private Call callDownload;
-
+    private Disposable mDownloadDisable;
     HttpNetClient client = new HttpNetClient();
+    private Request request;
 
     public static void show(Activity activity) {
         Intent intent = new Intent(activity, MainActivity.class);
         activity.startActivity(intent);
     }
+
+    public static final String API = "https://106.14.35.15:3334/";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,34 +68,28 @@ public class MainActivity extends AppCompatActivity {
         iv = (ImageView) findViewById(R.id.iv);
         text = (TextView) findViewById(R.id.text);
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
-        AppContext.getRefWatcher().watch(this);
     }
 
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_execute:
-//                rxExecute();
-//                //httpGet();
-//                rxGetHttp();
+                rxExecute();
                 break;
             case R.id.btn_cancel:
                 if (callExe != null) {
                     callExe.cancel();
+                }
+                if (mDownloadDisable != null) {
+                    mDownloadDisable.dispose();
                 }
                 if (callDownload != null) {
                     callDownload.cancel();
                 }
                 break;
             case R.id.btn_download:
-                //rxDownload();
-                //rangeDownload();
                 rxRangeDownload();
                 break;
         }
-    }
-
-    private void rxGetHttp() {
-
     }
 
     /**
@@ -102,7 +100,7 @@ public class MainActivity extends AppCompatActivity {
         final long readySize = rangeFile.exists() ? rangeFile.length() : 0;
         Headers.Builder headers = new Headers.Builder()
                 .addHeader("Range", "bytes=" + readySize + "-");
-        Request request = new Request.Builder()
+        final Request request = new Request.Builder()
                 .url("http://f1.market.xiaomi.com/download/AppStore/0117653278abecee8762883a940e129e9d242ae7d/com.huanghaibin_dev.cnblogs.apk")
                 .headers(headers)
                 .build();
@@ -110,33 +108,28 @@ public class MainActivity extends AppCompatActivity {
         Observable.create(new ObservableOnSubscribe<String>() {
             @Override
             public void subscribe(ObservableEmitter<String> e) throws Exception {
-                try {
-                    Response response = callDownload.execute();
-                    InputStream is = response.toStream();
-                    RandomAccessFile randomAccessFile = new RandomAccessFile(rangeFile, "rw");
-                    randomAccessFile.seek(readySize);
-                    int length = response.getContentLength();
-                    length += readySize;
-                    int p = (int) readySize;
-                    int bytes;
-                    byte[] buffer = new byte[1024];
-                    while ((bytes = is.read(buffer)) != -1) {
-                        randomAccessFile.write(buffer, 0, bytes);
-                        p += bytes;
-                        e.onNext(String.valueOf((p / (float) length) * 100));
-                    }
-                    response.close();
-                } catch (Exception error) {
-                    error.printStackTrace();
-                    e.onError(error);
+                Response response = callDownload.execute();
+                InputStream is = response.toStream();
+                RandomAccessFile randomAccessFile = new RandomAccessFile(rangeFile, "rw");
+                randomAccessFile.seek(readySize);
+                int length = response.getContentLength();
+                length += readySize;
+                int p = (int) readySize;
+                int bytes;
+                byte[] buffer = new byte[1024];
+                while ((bytes = is.read(buffer)) != -1) {
+                    randomAccessFile.write(buffer, 0, bytes);
+                    p += bytes;
+                    e.onNext(String.valueOf((p / (float) length) * 100));
                 }
+                response.close();
             }
         }).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Observer<String>() {
                     @Override
                     public void onSubscribe(Disposable d) {
-
+                        mDownloadDisable = d;
                     }
 
                     @Override
@@ -148,7 +141,7 @@ public class MainActivity extends AppCompatActivity {
 
                     @Override
                     public void onError(Throwable e) {
-
+                        text.setText("暂停下载");
                     }
 
                     @Override

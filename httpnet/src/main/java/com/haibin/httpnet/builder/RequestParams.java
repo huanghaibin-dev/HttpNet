@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2016 huanghaibin_dev <huanghaibin_dev@163.com>
- * WebSite https://github.com/MiracleTimes-Dev
+ * WebSite https://github.com/huanghaibin_dev
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,7 +19,7 @@ import java.io.File;
 import java.util.IdentityHashMap;
 
 /**
- *
+ * 请求参数
  */
 @SuppressWarnings("all")
 public final class RequestParams {
@@ -79,7 +79,10 @@ public final class RequestParams {
         return multiParams;
     }
 
-    public class Key {
+    /**
+     * 静态内部类包装Key,避免内存泄露
+     */
+    public static class Key {
         private String name;
 
         public Key(String name) {

@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2016 huanghaibin_dev <huanghaibin_dev@163.com>
- * WebSite https://github.com/MiracleTimes-Dev
+ * WebSite https://github.com/huanghaibin_dev
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -109,8 +109,11 @@ public class HttpConnection extends Connection {
 
     @Override
     public void disconnect() {
-        if (mHttpUrlConnection != null)
-            mHttpUrlConnection.disconnect();
+        if (mHttpUrlConnection != null) {
+            IO.close(mInputStream, mOutputStream);
+            //mHttpUrlConnection.disconnect();
+        }
+
     }
 
     @Override

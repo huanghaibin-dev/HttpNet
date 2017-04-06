@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2016 huanghaibin_dev <huanghaibin_dev@163.com>
- * WebSite https://github.com/MiracleTimes-Dev
+ * WebSite https://github.com/huanghaibin_dev
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -28,7 +28,9 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.URLConnection;
 
+import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLSession;
 
 /**
  * https连接
@@ -51,6 +53,12 @@ public class HttpsConnection extends Connection {
     void connect(URLConnection connection, String method) throws IOException {
         mHttpsUrlConnection = (HttpsURLConnection) connection;
         mHttpsUrlConnection.setSSLSocketFactory(mClient.getSslSocketFactory());
+        mHttpsUrlConnection.setHostnameVerifier(new HostnameVerifier() {
+            @Override
+            public boolean verify(String hostname, SSLSession session) {
+                return true;
+            }
+        });
         mHttpsUrlConnection.setRequestMethod(method);
         mHttpsUrlConnection.setUseCaches(true);
         mHttpsUrlConnection.setConnectTimeout(mRequest.timeout());

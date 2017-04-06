@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2016 huanghaibin_dev <huanghaibin_dev@163.com>
- * WebSite https://github.com/MiracleTimes-Dev
+ * WebSite https://github.com/huanghaibin_dev
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -60,6 +60,7 @@ public abstract class Connection {
             callBack.onFailure(e);
         } finally {
             finish();
+            disconnect();
         }
     }
 
@@ -157,9 +158,12 @@ public abstract class Connection {
         String method = request.method().toUpperCase();
         String httpUrl = request.url();
         if ("GET".equals(method) || "DELETE".equals(method) || "PATCH".equals(method)) {
-            if (request.params() != null && request.params().getTextParams() != null) {
+            RequestParams params = request.params();
+            if (params != null
+                    && params.getTextParams() != null
+                    && params.getTextParams().size() != 0) {
                 String paramsStr = request.content().intoString();
-                httpUrl = httpUrl + (httpUrl.endsWith("?") ? paramsStr : "?" + paramsStr);
+                httpUrl = httpUrl + (httpUrl.contains("?") ? paramsStr : "?" + paramsStr);
             }
         }
         return httpUrl;
