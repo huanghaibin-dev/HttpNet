@@ -222,7 +222,7 @@ client.newCall(request)
                         Log.e("当前进度", "  --  " + ((float) currentLength / totalLength) * 100);
                     }
                 })
-                .execute(new CallBack() {
+                .execute(new Callback() {
                     @Override
                     public void onResponse(Response response) {
                         String body = response.getBody();
